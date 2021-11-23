@@ -1,43 +1,20 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider.table;
 
+import com.doomedcat17.nbpexchangeapi.data.nbp.client.NbpApiClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 
 public class DefaultNbpTableProvider implements NbpTableProvider {
 
-    private final String NBP_TABLE_URL = "http://api.nbp.pl/api/exchangerates/tables/";
+    private final String NBP_TABLES_RESOURCE_PATH = "http://api.nbp.pl/api/exchangerates/tables/";
+
+    private final NbpApiClient nbpApiClient;
 
     public JSONObject getTable(String tableName) throws IOException {
-        URL nbpUrl = new URL(NBP_TABLE_URL+tableName);
-        HttpURLConnection connection = (HttpURLConnection) nbpUrl.openConnection();
-        int responseCode = connection.getResponseCode();
-        if (responseCode == 200) {
-            try (InputStream requestInputStream = connection.getInputStream()) {
-                BufferedReader responseBodyReader =
-                        new BufferedReader(
-                                new InputStreamReader(requestInputStream, StandardCharsets.UTF_8)
-                        );
-                String responseBody = readBody(responseBodyReader);
-                return retriveTableFromBody(responseBody);
-            }
-        } else throw new IOException();
-    }
-
-    private String readBody(BufferedReader responseBodyReader) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        String line;
-        while ((line = responseBodyReader.readLine()) != null) {
-            stringBuilder.append(line);
-        }
-        return stringBuilder.toString();
+        String responseBody = nbpApiClient.requestResource(NBP_TABLES_RESOURCE_PATH);
+        return retriveTableFromBody(responseBody);
     }
 
     //table object inside an array
@@ -46,5 +23,7 @@ public class DefaultNbpTableProvider implements NbpTableProvider {
         return (JSONObject) jsonArray.get(0);
     }
 
-
+    public DefaultNbpTableProvider(NbpApiClient nbpApiClient) {
+        this.nbpApiClient = nbpApiClient;
+    }
 }
