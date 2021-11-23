@@ -1,5 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider.table;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class DefaultNbpTableProvider implements NbpTableProvider {
     private final String NBP_TABLE_URL = "http://api.nbp.pl/api/exchangerates/tables/";
 
     public JSONObject getTable(String tableName) throws IOException {
-        URL nbpUrl = new URL(NBP_TABLE_URL);
+        URL nbpUrl = new URL(NBP_TABLE_URL+tableName);
         HttpURLConnection connection = (HttpURLConnection) nbpUrl.openConnection();
         int responseCode = connection.getResponseCode();
         if (responseCode == 200) {
@@ -25,7 +26,7 @@ public class DefaultNbpTableProvider implements NbpTableProvider {
                                 new InputStreamReader(requestInputStream, StandardCharsets.UTF_8)
                         );
                 String responseBody = readBody(responseBodyReader);
-                return new JSONObject(responseBody);
+                return retriveTableFromBody(responseBody);
             }
         } else throw new IOException();
     }
@@ -38,5 +39,12 @@ public class DefaultNbpTableProvider implements NbpTableProvider {
         }
         return stringBuilder.toString();
     }
+
+    //table object inside an array
+    private JSONObject retriveTableFromBody(String responseBody) {
+        JSONArray jsonArray = new JSONArray(responseBody);
+        return (JSONObject) jsonArray.get(0);
+    }
+
 
 }
