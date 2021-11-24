@@ -2,8 +2,8 @@ package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.data.nbp.NbpCurrency;
 import com.doomedcat17.nbpexchangeapi.data.nbp.provider.table.NbpTableProvider;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -21,19 +21,18 @@ public class DefaultNpbCurrencyProvider implements NpbCurrencyProvider{
     public List<NbpCurrency> getNbpCurrencies() throws IOException {
         List<NbpCurrency> nbpCurrencies = new ArrayList<>();
         for (String tableName: tableNames) {
-            JSONObject jsonTableObject = nbpTableProvider.getTable(tableName);
+            JsonNode jsonTableObject = nbpTableProvider.getTable(tableName);
             nbpCurrencies.addAll(mapTable(jsonTableObject));
         }
         return nbpCurrencies;
     }
 
-    private List<NbpCurrency> mapTable(JSONObject jsonTableObject) {
+    private List<NbpCurrency> mapTable(JsonNode jsonTableObject) {
         List<NbpCurrency> nbpCurrencies = new ArrayList<>();
-        LocalDate tableEffectiveDate = LocalDate.parse(jsonTableObject.getString("effectiveDate"));
-        JSONArray tableCurrencies = jsonTableObject.getJSONArray("rates");
-        tableCurrencies.forEach(object -> {
-            JSONObject jsonCurrencyObject = (JSONObject) object;
-            NbpCurrency nbpCurrency = NbpCurrency.applyJson(jsonCurrencyObject);
+        LocalDate tableEffectiveDate = LocalDate.parse(jsonTableObject.get("effectiveDate").asText());
+        ArrayNode tableCurrencies = (ArrayNode) jsonTableObject.get("rates");
+        tableCurrencies.forEach(jsonCurrency -> {
+            NbpCurrency nbpCurrency = NbpCurrency.applyJson(jsonCurrency);
             nbpCurrency.setEffectiveDate(tableEffectiveDate);
             nbpCurrencies.add(nbpCurrency);
         });

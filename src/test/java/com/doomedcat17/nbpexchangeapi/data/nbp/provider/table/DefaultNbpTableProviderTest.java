@@ -1,7 +1,8 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider.table;
 
 import com.doomedcat17.nbpexchangeapi.data.nbp.client.DefaultNbpApiClient;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,10 +17,11 @@ class DefaultNbpTableProviderTest {
     void shouldProvideNbpTable() {
         try {
             //when
-            JSONObject responseJson = nbpTableProvider.getTable("a");
+            JsonNode responseJson = nbpTableProvider.getTable("a");
             //then
-            assertEquals("A", responseJson.getString("table"));
-            assertTrue(responseJson.getJSONArray("rates").length() > 0);
+            assertEquals("A", responseJson.get("table").asText());
+            ArrayNode jsonArray = (ArrayNode) responseJson.get("rates");
+            assertFalse(jsonArray.isEmpty());
         } catch (Exception e) {
             e.printStackTrace();
             fail();

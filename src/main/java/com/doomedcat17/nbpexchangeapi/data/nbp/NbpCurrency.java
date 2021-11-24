@@ -1,8 +1,8 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,11 +19,11 @@ public class NbpCurrency {
 
     private LocalDate effectiveDate;
 
-    public static NbpCurrency applyJson(JSONObject jsonObject) {
+    public static NbpCurrency applyJson(JsonNode jsonCurrency) {
         NbpCurrency nbpCurrency = new NbpCurrency();
-        nbpCurrency.setName(jsonObject.getString("currency"));
-        nbpCurrency.setCode(jsonObject.getString("code"));
-        nbpCurrency.setMidRateInPLN(jsonObject.getBigDecimal("mid"));
+        nbpCurrency.setName(jsonCurrency.get("currency").asText());
+        nbpCurrency.setCode(jsonCurrency.get("code").asText());
+        nbpCurrency.setMidRateInPLN(new BigDecimal(jsonCurrency.get("rate").asText()));
         return nbpCurrency;
     }
 
