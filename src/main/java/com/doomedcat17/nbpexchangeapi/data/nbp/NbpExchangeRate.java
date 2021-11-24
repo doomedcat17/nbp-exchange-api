@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class NbpCurrency {
+public class NbpExchangeRate {
 
     private String name;
 
@@ -19,12 +19,12 @@ public class NbpCurrency {
 
     private LocalDate effectiveDate;
 
-    public static NbpCurrency applyJson(JsonNode jsonCurrency) {
-        NbpCurrency nbpCurrency = new NbpCurrency();
-        nbpCurrency.setName(jsonCurrency.get("currency").asText());
-        nbpCurrency.setCode(jsonCurrency.get("code").asText());
-        nbpCurrency.setMidRateInPLN(new BigDecimal(jsonCurrency.get("mid").asText()));
-        return nbpCurrency;
+    public static NbpExchangeRate applyJson(JsonNode jsonCurrency) {
+        NbpExchangeRate nbpExchangeRAte = new NbpExchangeRate();
+        nbpExchangeRAte.setName(jsonCurrency.get("currency").asText());
+        nbpExchangeRAte.setCode(jsonCurrency.get("code").asText());
+        nbpExchangeRAte.setMidRateInPLN(new BigDecimal(jsonCurrency.get("mid").asText()));
+        return nbpExchangeRAte;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class NbpCurrency {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        NbpCurrency that = (NbpCurrency) o;
+        NbpExchangeRate that = (NbpExchangeRate) o;
 
         if (!name.equals(that.name)) return false;
         return code.equals(that.code);

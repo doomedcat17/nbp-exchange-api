@@ -25,6 +25,11 @@ public class Currency {
     @OneToMany(mappedBy="buy")
     private Set<ExchangeRate> buyExchangeRates;
 
+    public Currency(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

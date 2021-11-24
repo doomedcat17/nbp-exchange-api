@@ -4,12 +4,14 @@ import com.doomedcat17.nbpexchangeapi.data.model.ExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.dao.ExchangeRateDao;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class ExchangeRatesRepository {
 
     private final ExchangeRateDao exchangeRateDao;
 
-    private void saveExchangeRate(ExchangeRate exchangeRate) {
+    public void saveExchangeRate(ExchangeRate exchangeRate) {
         ExchangeRate presentExchangeRate = exchangeRateDao.getByBuyAndSellAndEffectiveDate(
                 exchangeRate.getBuy(),
                 exchangeRate.getSell(),
@@ -19,6 +21,12 @@ public class ExchangeRatesRepository {
             presentExchangeRate.setRate(exchangeRate.getRate());
         } else exchangeRateDao.save(exchangeRate);
     }
+
+    public void saveExchangeRates(List<ExchangeRate> exchangeRates) {
+        exchangeRates.forEach(this::saveExchangeRate);
+    }
+
+
 
 
     public ExchangeRatesRepository(ExchangeRateDao exchangeRateDao) {
