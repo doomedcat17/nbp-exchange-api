@@ -2,6 +2,7 @@ package com.doomedcat17.nbpexchangeapi.data.nbp;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,9 +13,19 @@ public class NbpCurrency {
 
     private String name;
 
+    private String code;
+
     private BigDecimal midRateInPLN;
 
     private LocalDate effectiveDate;
+
+    public static NbpCurrency applyJson(JSONObject jsonObject) {
+        NbpCurrency nbpCurrency = new NbpCurrency();
+        nbpCurrency.setName(jsonObject.getString("currency"));
+        nbpCurrency.setCode(jsonObject.getString("code"));
+        nbpCurrency.setMidRateInPLN(jsonObject.getBigDecimal("mid"));
+        return nbpCurrency;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -24,13 +35,13 @@ public class NbpCurrency {
         NbpCurrency that = (NbpCurrency) o;
 
         if (!name.equals(that.name)) return false;
-        return effectiveDate.equals(that.effectiveDate);
+        return code.equals(that.code);
     }
 
     @Override
     public int hashCode() {
         int result = name.hashCode();
-        result = 31 * result + effectiveDate.hashCode();
+        result = 31 * result + code.hashCode();
         return result;
     }
 }
