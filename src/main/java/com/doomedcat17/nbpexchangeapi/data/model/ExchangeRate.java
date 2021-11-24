@@ -33,6 +33,23 @@ public class ExchangeRate {
 
     private LocalDate effectiveDate;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        ExchangeRate that = (ExchangeRate) o;
 
+        if (!sell.equals(that.sell)) return false;
+        if (!buy.equals(that.buy)) return false;
+        return effectiveDate.equals(that.effectiveDate);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sell.hashCode();
+        result = 31 * result + buy.hashCode();
+        result = 31 * result + effectiveDate.hashCode();
+        return result;
+    }
 }
