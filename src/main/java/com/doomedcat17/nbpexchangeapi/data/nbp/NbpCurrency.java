@@ -23,7 +23,7 @@ public class NbpCurrency {
         NbpCurrency nbpCurrency = new NbpCurrency();
         nbpCurrency.setName(jsonCurrency.get("currency").asText());
         nbpCurrency.setCode(jsonCurrency.get("code").asText());
-        nbpCurrency.setMidRateInPLN(new BigDecimal(jsonCurrency.get("rate").asText()));
+        nbpCurrency.setMidRateInPLN(new BigDecimal(jsonCurrency.get("mid").asText()));
         return nbpCurrency;
     }
 

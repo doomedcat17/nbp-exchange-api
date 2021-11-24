@@ -6,6 +6,7 @@ import com.doomedcat17.nbpexchangeapi.data.nbp.provider.table.DefaultNbpTablePro
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -45,8 +47,7 @@ class DefaultNpbCurrencyProviderTest {
         //when
         List<NbpCurrency> nbpCurrencies = npbCurrencyProvider.getNbpCurrencies();
         //then
-        System.out.println(nbpCurrencies.size());
-
+        assertEquals(70, nbpCurrencies.size());
     }
 
 
