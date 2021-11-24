@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class DefaultNpbCurrencyProvider implements NpbCurrencyProvider{
+public class DefaultNbpRatesProvider implements NbpRatesProvider {
 
     private final NbpTableProvider nbpTableProvider;
 
@@ -43,7 +43,7 @@ public class DefaultNpbCurrencyProvider implements NpbCurrencyProvider{
 
 
 
-    public DefaultNpbCurrencyProvider(NbpTableProvider nbpTableProvider) {
+    public DefaultNbpRatesProvider(NbpTableProvider nbpTableProvider) {
         this.nbpTableProvider = nbpTableProvider;
     }
 }

@@ -19,13 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(MockitoExtension.class)
-class DefaultNpbCurrencyProviderTest {
+class DefaultNbpRatesProviderTest {
 
     @Mock
     private DefaultNbpTableProvider tableProvider;
 
     @InjectMocks
-    private DefaultNpbCurrencyProvider npbCurrencyProvider;
+    private DefaultNbpRatesProvider npbCurrencyProvider;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
