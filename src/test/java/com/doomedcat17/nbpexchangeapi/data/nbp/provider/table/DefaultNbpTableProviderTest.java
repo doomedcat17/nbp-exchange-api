@@ -4,8 +4,6 @@ import com.doomedcat17.nbpexchangeapi.data.nbp.client.DefaultNbpApiClient;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultNbpTableProviderTest {
@@ -15,11 +13,17 @@ class DefaultNbpTableProviderTest {
     );
 
     @Test
-    void shouldProvideNbpTable() throws IOException {
-        //when
-        JSONObject jsonObject = nbpTableProvider.getTable("a");
-        //then
-        System.out.println("meow");
+    void shouldProvideNbpTable() {
+        try {
+            //when
+            JSONObject responseJson = nbpTableProvider.getTable("a");
+            //then
+            assertEquals("A", responseJson.getString("table"));
+            assertTrue(responseJson.getJSONArray("rates").length() > 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
 }

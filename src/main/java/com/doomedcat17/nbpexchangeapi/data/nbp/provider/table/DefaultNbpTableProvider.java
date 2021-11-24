@@ -8,12 +8,12 @@ import java.io.IOException;
 
 public class DefaultNbpTableProvider implements NbpTableProvider {
 
-    private final String NBP_TABLES_RESOURCE_PATH = "http://api.nbp.pl/api/exchangerates/tables/";
+    private final String NBP_TABLES_RESOURCE_PATH = "exchangerates/tables/";
 
     private final NbpApiClient nbpApiClient;
 
     public JSONObject getTable(String tableName) throws IOException {
-        String responseBody = nbpApiClient.requestResource(NBP_TABLES_RESOURCE_PATH);
+        String responseBody = nbpApiClient.requestResource(NBP_TABLES_RESOURCE_PATH+tableName);
         return retriveTableFromBody(responseBody);
     }
 
