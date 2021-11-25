@@ -1,6 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
 
-import com.doomedcat17.nbpexchangeapi.data.nbp.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 
 import java.io.IOException;
 import java.util.List;

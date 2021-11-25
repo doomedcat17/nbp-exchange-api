@@ -1,6 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
 
-import com.doomedcat17.nbpexchangeapi.data.nbp.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.nbp.provider.table.NbpTableProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

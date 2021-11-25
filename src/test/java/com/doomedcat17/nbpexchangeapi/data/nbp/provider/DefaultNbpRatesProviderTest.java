@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.TestDataProvider;
-import com.doomedcat17.nbpexchangeapi.data.nbp.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.nbp.provider.table.DefaultNbpTableProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
@@ -30,7 +30,7 @@ class DefaultNbpRatesProviderTest {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void shouldProvideAllNbpCurrencies() throws IOException, JSONException {
+    void shouldProvideAllNbpCurrencies() throws IOException {
         //given
         String tableAJson = TestDataProvider.jsonStringFromFile("src/test/resources/npb_table_a.json");
         Mockito.when(
