@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public interface NbpExchangeRateDAO extends JpaRepository<NbpExchangeRate, Long> {
 
@@ -14,9 +15,13 @@ public interface NbpExchangeRateDAO extends JpaRepository<NbpExchangeRate, Long>
     NbpExchangeRate getByCurrencyCodeAndEffectiveDate(@Param("code") String code, @Param("effectiveDate") LocalDate effectiveDate);
 
     @Query(nativeQuery = true, value = "SELECT * FROM nbp_exchange_rates WHERE currency_code = :code ORDER BY effective_date DESC LIMIT 1")
-    NbpExchangeRate getLatestByCurrencyCode(@Param("code") String code);
+    NbpExchangeRate getMostRecentByCode(@Param("code") String code);
 
     @Query(nativeQuery = true, value = "SELECT * FROM nbp_exchange_rates WHERE currency_code = :code ORDER BY effective_date DESC")
     List<NbpExchangeRate> getAllByCurrencyCode(@Param("code") String code);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM nbp_exchange_rates rates WHERE rates.effective_date = " +
+            "(SELECT MAX(rates2.effective_date) FROM nbp_exchange_rates rates2 WHERE rates.currency_code = rates2.currency_code)")
+    Set<NbpExchangeRate> getRecent();
 
 }

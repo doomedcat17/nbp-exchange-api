@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,7 +25,7 @@ class NbpExchangeRateDAOTest {
         supplyNbpExchangeRateDAOWithDummyData();
     }
     @Test
-    void shouldReturnLatest() {
+    void shouldReturnMostRecent() {
         //given
         Currency currency = new Currency();
         currency.setCode("USD");
@@ -36,7 +37,7 @@ class NbpExchangeRateDAOTest {
         expectedNbpExchangeRate.setEffectiveDate(LocalDate.parse("2021-09-02"));
 
         //when
-        NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO.getLatestByCurrencyCode("USD");
+        NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO.getMostRecentByCode("USD");
 
         //then
         assertEquals(expectedNbpExchangeRate, foundExchangeRate);
@@ -63,6 +64,14 @@ class NbpExchangeRateDAOTest {
         assertEquals("USD", foundExchangeRate.getCurrency().getCode());
         assertEquals(date, foundExchangeRate.getEffectiveDate());
 
+    }
+
+    @Test
+    void shouldReturnMostRecentForEachCurrency() {
+        //when
+        Set<NbpExchangeRate> nbpExchangeRates = nbpExchangeRateDAO.getRecent();
+        //then
+        assertEquals(2, nbpExchangeRates.size());
     }
 
     private void supplyNbpExchangeRateDAOWithDummyData() {
