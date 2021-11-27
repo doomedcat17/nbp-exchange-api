@@ -32,7 +32,7 @@ class ExchangeRatesServiceTest {
         //given
         NbpExchangeRate nbpExchangeRate = new NbpExchangeRate();
         nbpExchangeRate.setCurrency(new Currency("USD", "Dolar amerykański"));
-        nbpExchangeRate.setMidRateInPLN(new BigDecimal("4.17"));
+        nbpExchangeRate.setMidRateInPLN(new BigDecimal("4.16"));
         nbpExchangeRate.setEffectiveDate(LocalDate.parse("2021-11-25"));
 
         String code = "USD";
@@ -60,7 +60,7 @@ class ExchangeRatesServiceTest {
                 .filter(rateDTO -> rateDTO.getCode().equals("GBP"))
                 .findFirst().orElse(null);
         assertAll("Should all match",
-                () -> assertEquals(new BigDecimal("115.37"), jpyRate.getRate()),
+                () -> assertEquals(new BigDecimal("115.36"), jpyRate.getRate()),
                 () -> assertEquals(new BigDecimal("1.39"), audRate.getRate()),
                 () -> assertEquals(new BigDecimal("0.75"), gbpRate.getRate())
         );
@@ -72,24 +72,24 @@ class ExchangeRatesServiceTest {
     private Set<NbpExchangeRate> testData() {
         NbpExchangeRate nbpExchangeRate = new NbpExchangeRate();
         nbpExchangeRate.setCurrency(new Currency("USD", "Dolar amerykański"));
-        nbpExchangeRate.setMidRateInPLN(new BigDecimal("4.17"));
+        nbpExchangeRate.setMidRateInPLN(new BigDecimal("4.16"));
         nbpExchangeRate.setEffectiveDate(LocalDate.parse("2021-11-25"));
 
         NbpExchangeRate nbpExchangeRate2 = new NbpExchangeRate();
         nbpExchangeRate2.setCurrency(new Currency("AUD", "Dolar australijski"));
-        nbpExchangeRate2.setMidRateInPLN(new BigDecimal("3.00"));
+        nbpExchangeRate2.setMidRateInPLN(new BigDecimal("2.9911"));
         nbpExchangeRate2.setEffectiveDate(LocalDate.parse("2021-11-25"));
 
 
         NbpExchangeRate nbpExchangeRate3 = new NbpExchangeRate();
         nbpExchangeRate3.setCurrency(new Currency("JPY", "Jen japoński"));
-        nbpExchangeRate3.setMidRateInPLN(new BigDecimal("0.036"));
+        nbpExchangeRate3.setMidRateInPLN(new BigDecimal("0.036062"));
         nbpExchangeRate3.setEffectiveDate(LocalDate.parse("2021-11-25"));
 
 
         NbpExchangeRate nbpExchangeRate4 = new NbpExchangeRate();
         nbpExchangeRate4.setCurrency(new Currency("GBP", "Funt brytyjski"));
-        nbpExchangeRate4.setMidRateInPLN(new BigDecimal("5.56"));
+        nbpExchangeRate4.setMidRateInPLN(new BigDecimal("5.5469"));
         nbpExchangeRate4.setEffectiveDate(LocalDate.parse("2021-11-25"));
         return Set.of(nbpExchangeRate, nbpExchangeRate2, nbpExchangeRate3, nbpExchangeRate4);
     }
