@@ -7,14 +7,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class DefaultNbpApiClient implements NbpApiClient {
 
     private final String NBP_API_ROOT = "http://api.nbp.pl/api/";
 
     @Override
-    public String requestResource(String resourcePath) throws IOException {
-        URL nbpUrl = new URL(NBP_API_ROOT+resourcePath);
+    public String requestResource(String resourcePath, Map<String, String> parameters) throws IOException {
+        URL nbpUrl = new URL(NBP_API_ROOT+resourcePath+parametersAsString(parameters));
         HttpURLConnection connection = (HttpURLConnection) nbpUrl.openConnection();
         int responseCode = connection.getResponseCode();
         if (responseCode == 200) {
@@ -27,6 +28,27 @@ public class DefaultNbpApiClient implements NbpApiClient {
             }
         } else throw new IOException();
     }
+
+    @Override
+    public String requestResource(String resourcePath) throws IOException {
+        return requestResource(resourcePath, Map.of());
+    }
+
+    private String parametersAsString(Map<String, String> parameters) {
+        if (parameters.isEmpty()) return "";
+        StringBuilder stringBuilder = new StringBuilder("?");
+        parameters.forEach((name, value) -> {
+            stringBuilder.append("name")
+                    .append("=")
+                    .append(value)
+                    .append("&");
+        });
+        stringBuilder.replace(
+                stringBuilder.length()-1,
+                stringBuilder.length(), "");
+        return stringBuilder.toString();
+    }
+
 
     private String readBody(BufferedReader responseBodyReader) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();

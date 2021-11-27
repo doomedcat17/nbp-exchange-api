@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 
 public class DefaultNbpTableProvider implements NbpTableProvider {
@@ -19,11 +20,16 @@ public class DefaultNbpTableProvider implements NbpTableProvider {
 
     public JsonNode getTable(String tableName) throws IOException {
         String responseBody = nbpApiClient.requestResource(NBP_TABLES_RESOURCE_PATH+tableName);
-        return retriveTableFromBody(responseBody);
+        return retrieveTableFromBody(responseBody);
+    }
+
+    @Override
+    public JsonNode getTableByDate(String tableName, LocalDate date) {
+        return null;
     }
 
     //table object inside an array
-    private JsonNode retriveTableFromBody(String responseBody) throws JsonProcessingException {
+    private JsonNode retrieveTableFromBody(String responseBody) throws JsonProcessingException {
         ArrayNode jsonArray = (ArrayNode) objectMapper.readTree(responseBody);
         return jsonArray.get(0);
     }

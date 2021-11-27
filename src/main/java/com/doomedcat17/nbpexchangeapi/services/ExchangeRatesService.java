@@ -14,7 +14,7 @@ import java.util.Set;
 @Service
 public class ExchangeRatesService {
 
-    private NbpExchangeRateRepository nbpExchangeRateRepository;
+    private final NbpExchangeRateRepository nbpExchangeRateRepository;
 
     public ExchangeRateDTO getMostRecentRates(String code) {
         Set<NbpExchangeRate> exchangeRates = nbpExchangeRateRepository.getMostRecent();
