@@ -4,7 +4,6 @@ import com.doomedcat17.nbpexchangeapi.TestDataProvider;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.nbp.provider.table.DefaultNbpTableProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,7 +42,7 @@ class DefaultNbpRatesProviderTest {
         ).thenReturn(objectMapper.readTree(tableBJson));
 
         //when
-        List<NbpExchangeRate> nbpCurrencies = npbCurrencyProvider.getNbpCurrencies();
+        List<NbpExchangeRate> nbpCurrencies = npbCurrencyProvider.getRecentNbpExchangeRates();
         //then
         assertEquals(70, nbpCurrencies.size());
     }

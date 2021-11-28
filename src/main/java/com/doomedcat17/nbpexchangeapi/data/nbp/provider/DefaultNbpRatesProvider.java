@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,25 +19,49 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
     private final Set<String> tableNames = Set.of("a", "b");
 
     @Override
-    public List<NbpExchangeRate> getNbpCurrencies() throws IOException {
-        List<NbpExchangeRate> nbpCurrencies = new ArrayList<>();
+    public List<NbpExchangeRate> getNbpExchangeRatesFromDate(LocalDate date) throws IOException {
+        List<NbpExchangeRate> exchangeRates = new ArrayList<>();
         for (String tableName: tableNames) {
-            JsonNode jsonTableObject = nbpTableProvider.getTable(tableName);
-            nbpCurrencies.addAll(mapTable(jsonTableObject));
+            JsonNode jsonTableObject = nbpTableProvider.getTableFromDate(tableName, date);
+            exchangeRates.addAll(mapTable(jsonTableObject));
         }
-        return nbpCurrencies;
+        return exchangeRates;
+    }
+
+    @Override
+    public List<NbpExchangeRate> getRecentNbpExchangeRates() throws IOException {
+        return getNbpExchangeRatesFromDate(LocalDate.now());
+    }
+
+    //work days only!!
+    @Override
+    public List<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now) throws IOException {
+        LocalDate date = now;
+        int remainingDays = 7;
+        List<NbpExchangeRate> exchangeRates = new ArrayList<>();
+        do {
+            if (!date.getDayOfWeek().equals(DayOfWeek.SUNDAY) && !date.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+                exchangeRates.addAll(
+                        getNbpExchangeRatesFromDate(date)
+                );
+                remainingDays--;
+            }
+            date = now.minusDays(1);
+        } while (remainingDays != 0);
+        return exchangeRates;
+
     }
 
     private List<NbpExchangeRate> mapTable(JsonNode jsonTableObject) {
-        List<NbpExchangeRate> nbpCurrencies = new ArrayList<>();
+        List<NbpExchangeRate> exchangeRates = new ArrayList<>();
         LocalDate tableEffectiveDate = LocalDate.parse(jsonTableObject.get("effectiveDate").asText());
         ArrayNode tableCurrencies = (ArrayNode) jsonTableObject.get("rates");
         tableCurrencies.forEach(jsonCurrency -> {
             NbpExchangeRate nbpExchangeRAte = NbpExchangeRate.applyJson(jsonCurrency);
             nbpExchangeRAte.setEffectiveDate(tableEffectiveDate);
-            nbpCurrencies.add(nbpExchangeRAte);
+            exchangeRates.add(nbpExchangeRAte);
         });
-        return nbpCurrencies;
+        return exchangeRates;
     }
 
 
