@@ -5,18 +5,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
 
+@Component
 public class DefaultNbpTableProvider implements NbpTableProvider {
 
     private final String NBP_TABLES_RESOURCE_PATH = "exchangerates/tables/";
 
     private final NbpApiClient nbpApiClient;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     public JsonNode getTable(String tableName) throws IOException {

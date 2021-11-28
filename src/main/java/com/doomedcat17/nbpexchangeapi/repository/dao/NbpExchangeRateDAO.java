@@ -24,4 +24,6 @@ public interface NbpExchangeRateDAO extends JpaRepository<NbpExchangeRate, Long>
             "(SELECT MAX(rates2.effective_date) FROM nbp_exchange_rates rates2 WHERE rates.currency_code = rates2.currency_code)")
     Set<NbpExchangeRate> getRecent();
 
+    void deleteAllByEffectiveDateBefore(LocalDate date);
+
 }

@@ -4,6 +4,7 @@ import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.nbp.provider.table.NbpTableProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class DefaultNbpRatesProvider implements NbpRatesProvider {
 
     private final NbpTableProvider nbpTableProvider;

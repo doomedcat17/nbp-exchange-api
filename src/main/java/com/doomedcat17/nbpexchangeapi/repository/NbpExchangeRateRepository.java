@@ -3,7 +3,6 @@ package com.doomedcat17.nbpexchangeapi.repository;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDAO;
 import org.springframework.stereotype.Repository;
-
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -18,6 +17,14 @@ public class NbpExchangeRateRepository {
                         nbpExchangeRate.getCurrency().getCode(),
                         nbpExchangeRate.getEffectiveDate());
         if (prestentExchangeRate == null) nbpExchangeRateDAO.save(nbpExchangeRate);
+    }
+
+    public void addAllExchangeRates(Iterable<NbpExchangeRate> exchangeRates) {
+        exchangeRates.forEach(this::addExchangeRate);
+    }
+
+    public long getSize() {
+        return nbpExchangeRateDAO.count();
     }
 
     public Set<NbpExchangeRate> getMostRecent() {
