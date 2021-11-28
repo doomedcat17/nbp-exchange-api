@@ -28,7 +28,16 @@ public class DefaultNbpTableProvider implements NbpTableProvider {
         String responseBody = nbpApiClient.requestResource(NBP_TABLES_RESOURCE_PATH+tableName+"/"+localDate.toString());
         return retriveTableFromBody(responseBody);
     }
-    //table object inside an array
+
+    @Override
+    public ArrayNode getTableFromDates(String tableName, LocalDate startDate, LocalDate endDate) throws IOException {
+        String responseBody = nbpApiClient.requestResource(
+                NBP_TABLES_RESOURCE_PATH+tableName+"/"+startDate.toString()+"/"+endDate);
+        return (ArrayNode) objectMapper.readTree(responseBody);
+    }
+
+
+    //table object is inside an array
     private JsonNode retriveTableFromBody(String responseBody) throws JsonProcessingException {
         ArrayNode jsonArray = (ArrayNode) objectMapper.readTree(responseBody);
         return jsonArray.get(0);

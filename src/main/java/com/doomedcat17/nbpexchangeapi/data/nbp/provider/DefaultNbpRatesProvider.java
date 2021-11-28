@@ -22,34 +22,42 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
     public List<NbpExchangeRate> getNbpExchangeRatesFromDate(LocalDate date) throws IOException {
         List<NbpExchangeRate> exchangeRates = new ArrayList<>();
         for (String tableName: tableNames) {
-            JsonNode jsonTableObject = nbpTableProvider.getTableFromDate(tableName, date);
-            exchangeRates.addAll(mapTable(jsonTableObject));
+            JsonNode table = nbpTableProvider.getTableFromDate(tableName, date);
+            exchangeRates.addAll(mapTable(table));
         }
         return exchangeRates;
     }
 
-    @Override
-    public List<NbpExchangeRate> getRecentNbpExchangeRates() throws IOException {
-        return getNbpExchangeRatesFromDate(LocalDate.now());
-    }
 
     //work days only!!
     @Override
     public List<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now) throws IOException {
-        LocalDate date = now;
-        int remainingDays = 7;
+        LocalDate startDate = getStartDate(now);
         List<NbpExchangeRate> exchangeRates = new ArrayList<>();
+        for (String tableName: tableNames) {
+            ArrayNode tables = nbpTableProvider.getTableFromDates(tableName, startDate, now);
+            exchangeRates.addAll(mapTables(tables));
+        }
+        return exchangeRates;
+    }
+
+    private LocalDate getStartDate(LocalDate now) {
+        LocalDate startDate = now;
+        int remainingDays = 7;
         do {
-            if (!date.getDayOfWeek().equals(DayOfWeek.SUNDAY) && !date.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
-                exchangeRates.addAll(
-                        getNbpExchangeRatesFromDate(date)
-                );
+            if (!startDate.getDayOfWeek().equals(DayOfWeek.SUNDAY) && !startDate.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
                 remainingDays--;
             }
-            date = now.minusDays(1);
+            startDate = startDate.minusDays(1);
         } while (remainingDays != 0);
-        return exchangeRates;
+        return startDate;
+    }
 
+    private List<NbpExchangeRate> mapTables(ArrayNode jsonTablesArray) {
+        List<NbpExchangeRate> nbpExchangeRates = new ArrayList<>();
+        jsonTablesArray.elements()
+                .forEachRemaining(tableNode -> nbpExchangeRates.addAll(mapTable(tableNode)));
+        return nbpExchangeRates;
     }
 
     private List<NbpExchangeRate> mapTable(JsonNode jsonTableObject) {

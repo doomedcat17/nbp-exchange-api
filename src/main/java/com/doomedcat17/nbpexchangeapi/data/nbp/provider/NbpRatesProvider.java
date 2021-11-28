@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface NbpRatesProvider {
 
-    List<NbpExchangeRate> getRecentNbpExchangeRates() throws IOException;
 
     List<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now) throws IOException;
 

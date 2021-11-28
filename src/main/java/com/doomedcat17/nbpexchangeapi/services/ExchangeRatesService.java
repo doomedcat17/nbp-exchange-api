@@ -14,9 +14,9 @@ import java.util.Set;
 @Service
 public class ExchangeRatesService {
 
-    private NbpExchangeRateRepository nbpExchangeRateRepository;
+    private final NbpExchangeRateRepository nbpExchangeRateRepository;
 
-    public ExchangeRateDTO getMostRecentRates(String code) {
+    public ExchangeRateDTO getRecentRatesForCode(String code) {
         Set<NbpExchangeRate> exchangeRates = nbpExchangeRateRepository.getMostRecent();
         NbpExchangeRate baseExchangeRate = nbpExchangeRateRepository.getMostRecentByCode(code);
         Set<RateDTO> rates = new HashSet<>();
