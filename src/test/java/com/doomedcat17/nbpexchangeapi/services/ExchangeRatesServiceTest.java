@@ -44,7 +44,7 @@ class ExchangeRatesServiceTest {
                 .thenReturn(testData());
 
         //when
-        ExchangeRateDTO exchangeRateDTO = exchangeRatesService.getRecentRatesForCode(code);
+        ExchangeRateDTO exchangeRateDTO = exchangeRatesService.getRecentRatesByCode(code);
         //then
         assertEquals(code, exchangeRateDTO.getCode());
         assertEquals(3, exchangeRateDTO.getRates().size());

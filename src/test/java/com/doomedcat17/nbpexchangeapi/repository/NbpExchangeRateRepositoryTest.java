@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
@@ -40,7 +39,7 @@ class NbpExchangeRateRepositoryTest {
                 .thenReturn(new NbpExchangeRate());
 
         //when
-        nbpExchangeRateRepository.addExchangeRate(nbpExchangeRate);
+        nbpExchangeRateRepository.add(nbpExchangeRate);
 
         //then
         verify(nbpExchangeRateDAO, times(0)).save(any());

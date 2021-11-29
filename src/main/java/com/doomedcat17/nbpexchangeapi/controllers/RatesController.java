@@ -15,7 +15,7 @@ public class RatesController {
 
     @GetMapping("/{currencyCode}")
     public ExchangeRateDTO recentRatesForCode(@PathVariable(name = "currencyCode") String currencyCode) {
-        return exchangeRatesService.getRecentRatesForCode(currencyCode);
+        return exchangeRatesService.getRecentRatesByCode(currencyCode);
     }
 
     public RatesController(ExchangeRatesService exchangeRatesService) {

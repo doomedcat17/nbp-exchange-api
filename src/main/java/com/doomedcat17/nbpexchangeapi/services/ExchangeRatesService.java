@@ -15,7 +15,7 @@ public class ExchangeRatesService {
 
     private final NbpExchangeRateToRateDTOMapper nbpExchangeRateToRateDTOMapper;
 
-    public ExchangeRateDTO getRecentRatesForCode(String code) {
+    public ExchangeRateDTO getRecentRatesByCode(String code) {
         Set<NbpExchangeRate> exchangeRates = nbpExchangeRateRepository.getMostRecent();
         NbpExchangeRate baseExchangeRate = nbpExchangeRateRepository.getMostRecentByCode(code);
         Set<RateDTO> rates = nbpExchangeRateToRateDTOMapper.mapToRates(exchangeRates, baseExchangeRate);
