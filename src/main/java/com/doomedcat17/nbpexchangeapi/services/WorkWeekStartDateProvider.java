@@ -12,11 +12,16 @@ public class WorkWeekStartDateProvider {
         LocalDate startDate = now;
         int remainingDays = 7;
         do {
-            if (!startDate.getDayOfWeek().equals(DayOfWeek.SUNDAY) && !startDate.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+            if (remainingDays != 7) startDate = startDate.minusDays(1);
+            if (isNotHoliday(startDate)) {
                 remainingDays--;
             }
-            startDate = startDate.minusDays(1);
         } while (remainingDays != 0);
         return startDate;
+    }
+
+    private boolean isNotHoliday(LocalDate date) {
+        return !date.getDayOfWeek().equals(DayOfWeek.SUNDAY) &&
+                !date.getDayOfWeek().equals(DayOfWeek.SATURDAY);
     }
 }

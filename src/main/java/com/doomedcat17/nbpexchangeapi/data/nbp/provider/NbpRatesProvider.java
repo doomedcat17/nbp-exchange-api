@@ -8,6 +8,4 @@ public interface NbpRatesProvider {
 
 
     List<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now);
-
-    List<NbpExchangeRate> getNbpExchangeRatesFromDate(LocalDate date);
 }

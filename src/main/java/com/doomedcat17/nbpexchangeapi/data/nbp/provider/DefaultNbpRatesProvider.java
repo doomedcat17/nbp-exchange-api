@@ -22,20 +22,6 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
 
     private final Set<String> tableNames = Set.of("a", "b");
 
-    @Override
-    public List<NbpExchangeRate> getNbpExchangeRatesFromDate(LocalDate date) {
-        List<NbpExchangeRate> exchangeRates = new ArrayList<>();
-        try {
-            for (String tableName : tableNames) {
-                JsonNode table = nbpTableProvider.getTableFromDate(tableName, date);
-                exchangeRates.addAll(mapTable(table));
-            }
-        } catch (IOException ignored) {
-        }
-        return exchangeRates;
-    }
-
-
     //work days only!!
     @Override
     public List<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now){

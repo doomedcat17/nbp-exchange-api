@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultNbpTableProviderTest {
 
-    private NbpTableProvider nbpTableProvider = new DefaultNbpTableProvider(
+    private final NbpTableProvider nbpTableProvider = new DefaultNbpTableProvider(
             new DefaultNbpApiClient()
     );
 

@@ -1,6 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,7 +20,7 @@ public class NbpExchangeRate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name="currency_code", nullable=false)
     private Currency currency;
 
@@ -35,6 +36,12 @@ public class NbpExchangeRate {
         nbpExchangeRate.setCurrency(currency);
         nbpExchangeRate.setMidRateInPLN(new BigDecimal(jsonCurrency.get("mid").asText()));
         return nbpExchangeRate;
+    }
+
+    public NbpExchangeRate(Currency currency, BigDecimal midRateInPLN, LocalDate effectiveDate) {
+        this.currency = currency;
+        this.midRateInPLN = midRateInPLN;
+        this.effectiveDate = effectiveDate;
     }
 
     @Override

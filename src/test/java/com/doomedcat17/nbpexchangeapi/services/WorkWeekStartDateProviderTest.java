@@ -8,18 +8,28 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WorkWeekStartDateProviderTest {
 
-    private WorkWeekStartDateProvider workWeekStartDateProvider = new WorkWeekStartDateProvider();
+    private final WorkWeekStartDateProvider workWeekStartDateProvider = new WorkWeekStartDateProvider();
 
     @Test
-    void shouldProvideCorrectDate() {
+    void shouldProvideCorrectDates() {
         //given
-        LocalDate presentDate = LocalDate.parse("2021-11-29");
+        LocalDate presentDate1 = LocalDate.parse("2021-11-29");
+        LocalDate presentDate2 = LocalDate.parse("2021-11-30");
+        LocalDate presentDate3 = LocalDate.parse("2021-11-10");
+        LocalDate presentDate4 = LocalDate.parse("2021-11-15");
 
-        //when
-        LocalDate workWeekStartDate = workWeekStartDateProvider.get(presentDate);
 
         //then
-        assertEquals(LocalDate.parse("2021-11-18"), workWeekStartDate);
+        assertAll(
+                () -> assertEquals(LocalDate.parse("2021-11-19"),
+                        workWeekStartDateProvider.get(presentDate1)),
+                () -> assertEquals(LocalDate.parse("2021-11-22"),
+                        workWeekStartDateProvider.get(presentDate2)),
+                () -> assertEquals(LocalDate.parse("2021-11-02"),
+                        workWeekStartDateProvider.get(presentDate3)),
+                () -> assertEquals(LocalDate.parse("2021-11-05"),
+                        workWeekStartDateProvider.get(presentDate4))
+                );
     }
 
 }

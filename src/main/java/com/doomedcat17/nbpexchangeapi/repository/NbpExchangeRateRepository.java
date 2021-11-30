@@ -19,8 +19,6 @@ public class NbpExchangeRateRepository {
 
     private final WorkWeekStartDateProvider workWeekStartDateProvider;
 
-    private final CurrencyDAO currencyDAO;
-
     public synchronized void add(NbpExchangeRate nbpExchangeRate) {
         NbpExchangeRate prestentExchangeRate =
                 getByCodeAndEffectiveDate(
@@ -56,10 +54,8 @@ public class NbpExchangeRateRepository {
         return nbpExchangeRateDAO.getMostRecentByCode(code);
     }
 
-
-    public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDAO currencyDAO) {
+    public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider) {
         this.nbpExchangeRateDAO = nbpExchangeRateDAO;
         this.workWeekStartDateProvider = workWeekStartDateProvider;
-        this.currencyDAO = currencyDAO;
     }
 }

@@ -1,5 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.repository.dao;
 
+import com.doomedcat17.nbpexchangeapi.TestDataProvider;
 import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,25 +23,32 @@ class NbpExchangeRateDAOTest {
 
     @BeforeEach
     void init() {
-        supplyNbpExchangeRateDAOWithDummyData();
+        nbpExchangeRateDAO.saveAll(TestDataProvider.sampleExchangeRates());
     }
+
     @Test
     void shouldReturnMostRecent() {
         //given
-        Currency currency = new Currency();
-        currency.setCode("USD");
-        currency.setName("Dolar amerykański");
+        NbpExchangeRate expectedNbpExchangeRate =
+                new NbpExchangeRate(
+                        new Currency("USD", "Dolar amerykański"),
+                        new BigDecimal("4.09"),
+                        LocalDate.parse("2021-11-30"));
 
-        NbpExchangeRate expectedNbpExchangeRate = new NbpExchangeRate();
-        expectedNbpExchangeRate.setCurrency(currency);
-        expectedNbpExchangeRate.setMidRateInPLN(new BigDecimal("4.09"));
-        expectedNbpExchangeRate.setEffectiveDate(LocalDate.parse("2021-09-02"));
+        NbpExchangeRate expectedNbpExchangeRate2 =
+                new NbpExchangeRate(
+                        new Currency("AFN", "afgani (Afganistan)"),
+                        new BigDecimal("0.044308"),
+                        LocalDate.parse("2021-11-25"));
 
         //when
         NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO.getMostRecentByCode("USD");
+        NbpExchangeRate foundExchangeRate2 = nbpExchangeRateDAO.getMostRecentByCode("AFN");
 
         //then
-        assertEquals(expectedNbpExchangeRate, foundExchangeRate);
+        assertAll(
+                () -> assertEquals(expectedNbpExchangeRate, foundExchangeRate),
+                () -> assertEquals(expectedNbpExchangeRate2, foundExchangeRate2));
     }
 
     @Test
@@ -49,14 +57,14 @@ class NbpExchangeRateDAOTest {
         List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateDAO.getAllByCurrencyCode("USD");
 
         //then
-        assertEquals(2, foundExchangeRates.size());
+        assertEquals(10, foundExchangeRates.size());
 
     }
 
     @Test
     void shouldReturnMatchingExchangeRate() {
         //given
-        LocalDate date = LocalDate.parse("2021-07-02");
+        LocalDate date = LocalDate.parse("2021-11-25");
         //when
         NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO.getByCurrencyCodeAndEffectiveDate("USD", date);
 
@@ -68,40 +76,39 @@ class NbpExchangeRateDAOTest {
 
     @Test
     void shouldReturnMostRecentForEachCurrency() {
+        //given
+        LocalDate mostRecentDate = LocalDate.parse("2021-11-30");
+        LocalDate afnMostRecentDate = LocalDate.parse("2021-11-25");
+
         //when
         Set<NbpExchangeRate> nbpExchangeRates = nbpExchangeRateDAO.getRecent();
+
         //then
-        assertEquals(2, nbpExchangeRates.size());
+        assertAll(
+                () -> assertTrue(nbpExchangeRates.stream()
+                        .allMatch(nbpExchangeRate ->
+                                nbpExchangeRate.getEffectiveDate().equals(mostRecentDate) ||
+                                        (nbpExchangeRate.getCurrency().getCode().equals("AFN")
+                                                && nbpExchangeRate.getEffectiveDate().equals(afnMostRecentDate)
+                                        )
+                        )
+                ),
+                () -> assertEquals(5, nbpExchangeRates.size())
+        );
     }
 
-    private void supplyNbpExchangeRateDAOWithDummyData() {
-        Currency usdCurrency = new Currency();
-        usdCurrency.setCode("USD");
-        usdCurrency.setName("Dolar amerykański");
+    @Test
+    void shouldRemoveOlderThanGivenDate() {
+        //given
+        LocalDate date = LocalDate.parse("2021-11-22");
+        long sizeBefore = nbpExchangeRateDAO.count();
+        List<NbpExchangeRate> exchangeRates = nbpExchangeRateDAO.findAll();
 
-        Currency audCurrency = new Currency();
-        audCurrency.setCode("AUD");
-        audCurrency.setName("Dolar australijski");
+        //when
+        nbpExchangeRateDAO.deleteAllByEffectiveDateBefore(date);
 
-        NbpExchangeRate nbpExchangeRate = new NbpExchangeRate();
-        nbpExchangeRate.setCurrency(usdCurrency);
-        nbpExchangeRate.setMidRateInPLN(new BigDecimal("4.20"));
-        nbpExchangeRate.setEffectiveDate(LocalDate.parse("2021-07-02"));
-
-        NbpExchangeRate nbpExchangeRate2 = new NbpExchangeRate();
-        nbpExchangeRate2.setCurrency(usdCurrency);
-        nbpExchangeRate2.setMidRateInPLN(new BigDecimal("4.09"));
-        nbpExchangeRate2.setEffectiveDate(LocalDate.parse("2021-09-02"));
-
-        NbpExchangeRate nbpExchangeRate3 = new NbpExchangeRate();
-        nbpExchangeRate3.setCurrency(audCurrency);
-        nbpExchangeRate3.setMidRateInPLN(new BigDecimal("4.09"));
-        nbpExchangeRate3.setEffectiveDate(LocalDate.parse("2021-09-02"));
-
-        nbpExchangeRateDAO.save(nbpExchangeRate);
-        nbpExchangeRateDAO.save(nbpExchangeRate2);
-        nbpExchangeRateDAO.save(nbpExchangeRate3);
-
+        //then
+        assertEquals(sizeBefore-7, nbpExchangeRateDAO.count());
     }
 
 }
