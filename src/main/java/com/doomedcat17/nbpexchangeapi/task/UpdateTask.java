@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class UpdateTask implements Runnable {
@@ -23,7 +24,7 @@ public class UpdateTask implements Runnable {
 
     @Override
     public void run() {
-        List<NbpExchangeRate> nbpExchangeRates =
+        Set<NbpExchangeRate> nbpExchangeRates =
                 nbpRatesProvider.getNbpExchangeRatesFromLastWeek(LocalDate.now());
         if (nbpExchangeRates.isEmpty()){
             threadPoolTaskScheduler.schedule(this, Instant.ofEpochMilli(System.currentTimeMillis()+900000L));

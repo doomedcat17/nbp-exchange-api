@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,22 +38,30 @@ class DefaultNbpRatesProviderTest {
     void shouldProvideAllExchangeRatesFromLastWorkWeek() throws IOException {
         //given
         Mockito.when(workWeekStartDateProvider.get(LocalDate.parse("2021-11-26")))
-                .thenReturn(LocalDate.parse("2021-11-17"));
+                .thenReturn(LocalDate.parse("2021-11-18"));
 
-        String tablesAJson = TestDataProvider.jsonStringFromFile("src/test/resources/nbp_tables_a_2021-11-17_2021-11-26.json");
-        Mockito.when(
-                tableProvider.getTableFromDates("a", LocalDate.parse("2021-11-17"), LocalDate.parse("2021-11-26"))
-        ).thenReturn((ArrayNode) objectMapper.readTree(tablesAJson));
+        String tablesAJson = TestDataProvider.jsonStringFromFile("src/test/resources/nbp_tables_a_2021-11-18_2021-11-26.json");
 
-        String tablesBJson = TestDataProvider.jsonStringFromFile("src/test/resources/nbp_tables_b_2021-11-17_2021-11-26.json");
+        ArrayNode aTables = (ArrayNode) objectMapper.readTree(tablesAJson);
         Mockito.when(
-                tableProvider.getTableFromDates("b", LocalDate.parse("2021-11-17"), LocalDate.parse("2021-11-26"))
-        ).thenReturn((ArrayNode) objectMapper.readTree(tablesBJson));
+                tableProvider.getTableFromDates("a", LocalDate.parse("2021-11-18"), LocalDate.parse("2021-11-26"))
+        ).thenReturn(aTables);
+
+        String tablesBJson = TestDataProvider.jsonStringFromFile("src/test/resources/nbp_tables_b_2021-11-18_2021-11-26.json");
+
+        ArrayNode bTables = (ArrayNode) objectMapper.readTree(tablesBJson);
+        Mockito.when(
+                tableProvider.getTableFromDates("b", LocalDate.parse("2021-11-18"), LocalDate.parse("2021-11-26"))
+        ).thenReturn(bTables);
 
         //when
-        List<NbpExchangeRate> nbpExchangeRates = npbCurrencyProvider.getNbpExchangeRatesFromLastWeek(LocalDate.parse("2021-11-26"));
+        Set<NbpExchangeRate> nbpExchangeRates = npbCurrencyProvider.getNbpExchangeRatesFromLastWeek(LocalDate.parse("2021-11-26"));
         //then
-        assertEquals(510, nbpExchangeRates.size());
+        assertEquals(
+                7,
+                nbpExchangeRates.stream().filter(nbpExchangeRate -> nbpExchangeRate.getCurrency().getCode().equals("PLN")).count()
+        );
+        assertEquals(aTables.size()*35+bTables.size()*115+7, nbpExchangeRates.size());
     }
 
 

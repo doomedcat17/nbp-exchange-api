@@ -2,10 +2,10 @@ package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 public interface NbpRatesProvider {
 
 
-    List<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now);
+    Set<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now);
 }
