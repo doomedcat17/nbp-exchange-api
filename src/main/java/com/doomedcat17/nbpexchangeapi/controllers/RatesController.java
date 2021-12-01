@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/rates")
 public class RatesController {
 
-    private ExchangeRatesService exchangeRatesService;
+    private final ExchangeRatesService exchangeRatesService;
 
     @GetMapping("/{currencyCode}")
     public ExchangeRateDTO recentRatesForCode(@PathVariable(name = "currencyCode") String currencyCode) {

@@ -8,4 +8,6 @@ public interface NbpRatesProvider {
 
 
     Set<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now);
+
+    Set<NbpExchangeRate> getRecent();
 }

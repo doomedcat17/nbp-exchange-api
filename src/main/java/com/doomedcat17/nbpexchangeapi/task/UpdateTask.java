@@ -1,22 +1,13 @@
 package com.doomedcat17.nbpexchangeapi.task;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.nbp.provider.NbpRatesProvider;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import java.util.Set;
 
-@Component
+@Slf4j
 public class UpdateTask implements Runnable {
-
-    private final ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
     private final NbpExchangeRateRepository rateRepository;
 
@@ -24,23 +15,33 @@ public class UpdateTask implements Runnable {
 
     @Override
     public void run() {
-        Set<NbpExchangeRate> nbpExchangeRates =
-                nbpRatesProvider.getNbpExchangeRatesFromLastWeek(LocalDate.now());
-        if (nbpExchangeRates.isEmpty()){
-            threadPoolTaskScheduler.schedule(this, Instant.ofEpochMilli(System.currentTimeMillis()+900000L));
-        } else {
-            NbpExchangeRate plnExchangeRate = new NbpExchangeRate();
-            plnExchangeRate.setCurrency(new Currency("PLN", "Polski złoty"));
-            plnExchangeRate.setMidRateInPLN(new BigDecimal("1"));
-            plnExchangeRate.setEffectiveDate(LocalDate.now());
-            nbpExchangeRates.add(plnExchangeRate);
-            rateRepository.addAll(nbpExchangeRates);
-        }
+        update();
+        log.info("Removing rates older than week...");
         rateRepository.removeAllOlderThanWeek();
+        log.info("Removal success!");
     }
 
-    public UpdateTask(ThreadPoolTaskScheduler threadPoolTaskScheduler, NbpExchangeRateRepository rateRepository, NbpRatesProvider nbpRatesProvider) {
-        this.threadPoolTaskScheduler = threadPoolTaskScheduler;
+    private void update() {
+        log.info("Updating...");
+        Set<NbpExchangeRate> nbpExchangeRates =
+                nbpRatesProvider.getRecent();
+        if (nbpExchangeRates.isEmpty()){
+            try {
+                log.error("Update failed. Api returned empty collection");
+                log.info("Sleeping...");
+                Thread.sleep(900000L);
+                update();
+            } catch (InterruptedException e) {
+                log.error("Update process interrupted");
+                e.printStackTrace();
+            }
+        } else {
+            nbpExchangeRates.forEach(rateRepository::add);
+            log.info("Update success!");
+        }
+    }
+
+    public UpdateTask(NbpExchangeRateRepository rateRepository, NbpRatesProvider nbpRatesProvider) {
         this.rateRepository = rateRepository;
         this.nbpRatesProvider = nbpRatesProvider;
     }

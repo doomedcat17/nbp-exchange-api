@@ -38,6 +38,19 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
         return exchangeRates;
     }
 
+    @Override
+    public Set<NbpExchangeRate> getRecent() {
+        Set<NbpExchangeRate> exchangeRates = new HashSet<>();
+        try {
+            for (String tableName : tableNames) {
+                JsonNode table = nbpTableProvider.getTable(tableName);
+                exchangeRates.addAll(mapTable(table));
+            }
+        } catch (IOException ignored) {
+        }
+        return exchangeRates;
+    }
+
     private Set<NbpExchangeRate> mapTables(ArrayNode jsonTablesArray) {
         Set<NbpExchangeRate> nbpExchangeRates = new HashSet<>();
         jsonTablesArray.elements()

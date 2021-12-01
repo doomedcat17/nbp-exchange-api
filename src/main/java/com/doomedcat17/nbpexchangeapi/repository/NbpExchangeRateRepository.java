@@ -6,9 +6,9 @@ import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDAO;
 import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDAO;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
 import org.springframework.stereotype.Repository;
-
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -19,18 +19,18 @@ public class NbpExchangeRateRepository {
 
     private final WorkWeekStartDateProvider workWeekStartDateProvider;
 
+    private final CurrencyDAO currencyDAO;
+
     public synchronized void add(NbpExchangeRate nbpExchangeRate) {
         NbpExchangeRate prestentExchangeRate =
                 getByCodeAndEffectiveDate(
                         nbpExchangeRate.getCurrency().getCode(),
                         nbpExchangeRate.getEffectiveDate());
         if (prestentExchangeRate == null) {
+            Optional<Currency> currency = currencyDAO.findById(nbpExchangeRate.getCurrency().getCode());
+            currency.ifPresent(nbpExchangeRate::setCurrency);
             nbpExchangeRateDAO.save(nbpExchangeRate);
         }
-    }
-
-    public synchronized void addAll(Iterable<NbpExchangeRate> exchangeRates) {
-        exchangeRates.forEach(this::add);
     }
 
     public synchronized void removeAllOlderThanWeek() {
@@ -54,8 +54,9 @@ public class NbpExchangeRateRepository {
         return nbpExchangeRateDAO.getMostRecentByCode(code);
     }
 
-    public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider) {
+    public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDAO currencyDAO) {
         this.nbpExchangeRateDAO = nbpExchangeRateDAO;
         this.workWeekStartDateProvider = workWeekStartDateProvider;
+        this.currencyDAO = currencyDAO;
     }
 }
