@@ -1,4 +1,4 @@
-package com.doomedcat17.nbpexchangeapi.controllers;
+package com.doomedcat17.nbpexchangeapi.exceptions;
 
 import com.doomedcat17.nbpexchangeapi.exceptions.CurrencyNotFoundException;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -29,6 +29,16 @@ public class ControllerExceptionHandler {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         error.setTimestamp(LocalDateTime.now());
         error.setMessage("Invalid date format");
+        error.setStatus(httpStatus.value());
+        return new ResponseEntity<>(error, httpStatus);
+    }
+
+    @ExceptionHandler(MissingRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> missingParameter(Exception e) {
+        ErrorResponse error = new ErrorResponse();
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        error.setTimestamp(LocalDateTime.now());
+        error.setMessage(e.getMessage());
         error.setStatus(httpStatus.value());
         return new ResponseEntity<>(error, httpStatus);
     }
