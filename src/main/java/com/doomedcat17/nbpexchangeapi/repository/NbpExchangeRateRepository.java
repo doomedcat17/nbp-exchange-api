@@ -5,6 +5,7 @@ import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDAO;
 import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDAO;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -60,7 +61,9 @@ public class NbpExchangeRateRepository {
     }
 
     public NbpExchangeRate getMostRecentByCurrencyCode(String currencyCode) {
-        return nbpExchangeRateDAO.getMostRecentByCode(currencyCode);
+        List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateDAO.getMostRecentByCode(currencyCode, PageRequest.of(0, 1));
+        if (!foundExchangeRates.isEmpty()) return foundExchangeRates.get(0);
+        else return null;
     }
 
     public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDAO currencyDAO) {

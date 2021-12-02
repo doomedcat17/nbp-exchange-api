@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,8 +43,10 @@ class NbpExchangeRateDAOTest {
                         LocalDate.parse("2021-11-25"));
 
         //when
-        NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO.getMostRecentByCode("USD");
-        NbpExchangeRate foundExchangeRate2 = nbpExchangeRateDAO.getMostRecentByCode("AFN");
+        NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO
+                .getMostRecentByCode("USD", PageRequest.of(0, 1)).get(0);
+        NbpExchangeRate foundExchangeRate2 = nbpExchangeRateDAO
+                .getMostRecentByCode("AFN", PageRequest.of(0, 1)).get(0);
 
         //then
         assertAll(
