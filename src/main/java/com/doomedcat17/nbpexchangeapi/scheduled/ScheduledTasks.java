@@ -1,27 +1,27 @@
-package com.doomedcat17.nbpexchangeapi.task;
+package com.doomedcat17.nbpexchangeapi.scheduled;
 
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.services.nbp.provider.NbpRatesProvider;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
+import com.doomedcat17.nbpexchangeapi.services.nbp.provider.NbpRatesProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
 import java.util.Set;
 
+@Profile({"dev", "prod"})
+@Component
 @Slf4j
-public class UpdateTask implements Runnable {
+public class ScheduledTasks {
 
     private final NbpExchangeRateRepository rateRepository;
 
     private final NbpRatesProvider nbpRatesProvider;
 
-    @Override
-    public void run() {
-        update();
-        log.info("Removing rates older than week...");
-        rateRepository.removeAllOlderThanWeek();
-        log.info("Removal success!");
-    }
-
-    private void update() {
+    //12:31 pm everyday
+    @Scheduled(cron = "* 31 12 * * *")
+    public void update() {
         log.info("Updating...");
         Set<NbpExchangeRate> nbpExchangeRates =
                 nbpRatesProvider.getRecent();
@@ -39,9 +39,12 @@ public class UpdateTask implements Runnable {
             nbpExchangeRates.forEach(rateRepository::add);
             log.info("Update success!");
         }
+        log.info("Removing rates older than week...");
+        rateRepository.removeAllOlderThanWeek();
+        log.info("Removal success!");
     }
 
-    public UpdateTask(NbpExchangeRateRepository rateRepository, NbpRatesProvider nbpRatesProvider) {
+    public ScheduledTasks(NbpExchangeRateRepository rateRepository, NbpRatesProvider nbpRatesProvider) {
         this.rateRepository = rateRepository;
         this.nbpRatesProvider = nbpRatesProvider;
     }
