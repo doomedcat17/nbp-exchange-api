@@ -14,6 +14,8 @@ public interface NbpExchangeRateDAO extends JpaRepository<NbpExchangeRate, Long>
     @Query(nativeQuery = true, value = "SELECT * FROM nbp_exchange_rates WHERE currency_code = :code AND effective_date = :effectiveDate")
     NbpExchangeRate getByCurrencyCodeAndEffectiveDate(@Param("code") String code, @Param("effectiveDate") LocalDate effectiveDate);
 
+    Set<NbpExchangeRate> getAllByEffectiveDate(LocalDate date);
+
     @Query(nativeQuery = true, value = "SELECT * FROM nbp_exchange_rates WHERE currency_code = :code ORDER BY effective_date DESC LIMIT 1")
     NbpExchangeRate getMostRecentByCode(@Param("code") String code);
 

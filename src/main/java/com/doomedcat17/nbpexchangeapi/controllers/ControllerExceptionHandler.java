@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -18,6 +19,16 @@ public class ControllerExceptionHandler {
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         error.setTimestamp(LocalDateTime.now());
         error.setMessage(exception.getMessage());
+        error.setStatus(httpStatus.value());
+        return new ResponseEntity<>(error, httpStatus);
+    }
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<ErrorResponse> invalidDate() {
+        ErrorResponse error = new ErrorResponse();
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        error.setTimestamp(LocalDateTime.now());
+        error.setMessage("Invalid date format");
         error.setStatus(httpStatus.value());
         return new ResponseEntity<>(error, httpStatus);
     }

@@ -6,8 +6,13 @@ import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDAO;
 import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDAO;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +26,8 @@ public class NbpExchangeRateRepository {
 
     private final CurrencyDAO currencyDAO;
 
+    private final EntityManager entityManager;
+
     public synchronized void add(NbpExchangeRate nbpExchangeRate) {
         NbpExchangeRate prestentExchangeRate =
                 getByCodeAndEffectiveDate(
@@ -31,6 +38,51 @@ public class NbpExchangeRateRepository {
             currency.ifPresent(nbpExchangeRate::setCurrency);
             nbpExchangeRateDAO.save(nbpExchangeRate);
         }
+    }
+
+    public List<NbpExchangeRate> getNbpExchangeRates(String currencyCode, String dateString) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<NbpExchangeRate> criteriaQuery =
+                criteriaBuilder.createQuery(NbpExchangeRate.class);
+        Root<NbpExchangeRate> exchangeRateRoot = criteriaQuery.from(NbpExchangeRate.class);
+
+        Predicate currencyPredicate = null;
+        if (!currencyCode.isBlank()) {
+            currencyPredicate =
+                    criteriaBuilder.equal(exchangeRateRoot.get("currency").get("code"), currencyCode);
+            criteriaQuery.where(currencyPredicate);
+        }
+
+        Predicate datePredicate;
+        if (!dateString.isBlank()) {
+            datePredicate =
+                    criteriaBuilder.equal(
+                            exchangeRateRoot.get("effectiveDate"),
+                            LocalDate.parse(dateString));
+        } else {
+            Subquery<LocalDate> subQuery = criteriaQuery.subquery(LocalDate.class);
+            Root<NbpExchangeRate> subExchangeRateRoot = subQuery.from(NbpExchangeRate.class);
+
+            Expression<LocalDate> effectiveDate = subExchangeRateRoot.get("effectiveDate");
+            subQuery.select(criteriaBuilder.greatest(effectiveDate));
+
+            subQuery.where(criteriaBuilder.equal(subExchangeRateRoot.get("currency"),
+                    exchangeRateRoot.get("currency")));
+
+            datePredicate = criteriaBuilder.equal(exchangeRateRoot.get("effectiveDate"), subQuery);
+        }
+
+        Predicate condition;
+
+        if (currencyPredicate != null) condition = criteriaBuilder.and(currencyPredicate, datePredicate);
+        else condition = datePredicate;
+
+        criteriaQuery.where(condition);
+
+
+        TypedQuery<NbpExchangeRate> query = entityManager.createQuery(criteriaQuery);
+        return query.getResultList();
+
     }
 
     public synchronized void removeAllOlderThanWeek() {
@@ -50,13 +102,18 @@ public class NbpExchangeRateRepository {
                 .getByCurrencyCodeAndEffectiveDate(code, effectiveDate);
     }
 
+    public synchronized Set<NbpExchangeRate> getByAllByEffectiveDate(LocalDate effectiveDate) {
+        return nbpExchangeRateDAO.getAllByEffectiveDate(effectiveDate);
+    }
+
     public synchronized NbpExchangeRate getMostRecentByCode(String code) {
         return nbpExchangeRateDAO.getMostRecentByCode(code);
     }
 
-    public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDAO currencyDAO) {
+    public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDAO currencyDAO, EntityManager entityManager) {
         this.nbpExchangeRateDAO = nbpExchangeRateDAO;
         this.workWeekStartDateProvider = workWeekStartDateProvider;
         this.currencyDAO = currencyDAO;
+        this.entityManager = entityManager;
     }
 }
