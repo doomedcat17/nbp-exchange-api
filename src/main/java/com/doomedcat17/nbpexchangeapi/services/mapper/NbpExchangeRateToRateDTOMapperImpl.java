@@ -7,17 +7,15 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class NbpExchangeRateToRateDTOMapperImpl implements NbpExchangeRateToRateDTOMapper {
 
-    private final NbpExchangeRateRepository nbpExchangeRateRepository;
-
     @Override
-    public Set<RateDTO> mapToRates(Set<NbpExchangeRate> exchangesRateToMap, NbpExchangeRate baseExchangeRate) {
-        Set<RateDTO> rates = new HashSet<>();
+    public List<RateDTO> mapToRates(List<NbpExchangeRate> exchangesRateToMap, NbpExchangeRate baseExchangeRate) {
+        List<RateDTO> rates = new ArrayList<>();
         exchangesRateToMap.forEach(nbpExchangeRate -> {
             if (!nbpExchangeRate.equals(baseExchangeRate)) {
                 rates.add(mapToRate(nbpExchangeRate, baseExchangeRate));
@@ -28,15 +26,9 @@ public class NbpExchangeRateToRateDTOMapperImpl implements NbpExchangeRateToRate
 
     @Override
     public RateDTO mapToRate(NbpExchangeRate exchangeRateToMap, NbpExchangeRate baseExchangeRate) {
-        NbpExchangeRate sourceExchangeRate = baseExchangeRate;
-        if (!exchangeRateToMap.getEffectiveDate().equals(baseExchangeRate.getEffectiveDate())) {
-            sourceExchangeRate = nbpExchangeRateRepository
-                    .getByCodeAndEffectiveDate(
-                            baseExchangeRate.getCurrency().getCode(),
-                            exchangeRateToMap.getEffectiveDate()
-                    );
-        }
-        BigDecimal rate = sourceExchangeRate.getMidRateInPLN()
+        if (!exchangeRateToMap.getEffectiveDate().equals(baseExchangeRate.getEffectiveDate()))
+            throw new IllegalArgumentException();
+        BigDecimal rate = baseExchangeRate.getMidRateInPLN()
                 .divide(exchangeRateToMap.getMidRateInPLN(), RoundingMode.HALF_EVEN);
         RateDTO rateDTO = new RateDTO();
         rateDTO.setCode(exchangeRateToMap.getCurrency().getCode());
@@ -45,7 +37,4 @@ public class NbpExchangeRateToRateDTOMapperImpl implements NbpExchangeRateToRate
         return rateDTO;
     }
 
-    public NbpExchangeRateToRateDTOMapperImpl(NbpExchangeRateRepository nbpExchangeRateRepository) {
-        this.nbpExchangeRateRepository = nbpExchangeRateRepository;
-    }
 }

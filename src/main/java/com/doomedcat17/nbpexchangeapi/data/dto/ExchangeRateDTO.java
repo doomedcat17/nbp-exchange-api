@@ -2,7 +2,8 @@ package com.doomedcat17.nbpexchangeapi.data.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Set;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -10,5 +11,5 @@ public class ExchangeRateDTO {
 
     private String code;
 
-    Set<RateDTO> rates;
+    List<RateDTO> rates;
 }

@@ -14,7 +14,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 @Transactional
@@ -39,6 +38,7 @@ public class NbpExchangeRateRepository {
             nbpExchangeRateDAO.save(nbpExchangeRate);
         }
     }
+
 
     public List<NbpExchangeRate> getNbpExchangeRates(String currencyCode, String dateString) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -85,6 +85,17 @@ public class NbpExchangeRateRepository {
 
     }
 
+
+    public List<NbpExchangeRate> getAll(String currencyCode, String textDate) {
+        if (textDate.isBlank()) {
+            return nbpExchangeRateDAO.getAllByCurrencyCode(currencyCode);
+        } else {
+            LocalDate effectiveDate = LocalDate.parse(textDate);
+            return List.of(nbpExchangeRateDAO.getByCurrencyCodeAndEffectiveDate(currencyCode, effectiveDate));
+        }
+    }
+
+
     public synchronized void removeAllOlderThanWeek() {
         nbpExchangeRateDAO.deleteAllByEffectiveDateBefore(workWeekStartDateProvider.get(LocalDate.now()));
     }
@@ -93,7 +104,7 @@ public class NbpExchangeRateRepository {
         return nbpExchangeRateDAO.count();
     }
 
-    public synchronized Set<NbpExchangeRate> getMostRecent() {
+    public synchronized List<NbpExchangeRate> getMostRecent() {
         return nbpExchangeRateDAO.getRecent();
     }
 
@@ -102,7 +113,7 @@ public class NbpExchangeRateRepository {
                 .getByCurrencyCodeAndEffectiveDate(code, effectiveDate);
     }
 
-    public synchronized Set<NbpExchangeRate> getByAllByEffectiveDate(LocalDate effectiveDate) {
+    public synchronized List<NbpExchangeRate> getByAllByEffectiveDate(LocalDate effectiveDate) {
         return nbpExchangeRateDAO.getAllByEffectiveDate(effectiveDate);
     }
 

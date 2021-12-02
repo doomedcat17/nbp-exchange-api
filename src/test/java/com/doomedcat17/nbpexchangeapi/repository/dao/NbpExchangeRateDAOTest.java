@@ -81,7 +81,7 @@ class NbpExchangeRateDAOTest {
         LocalDate afnMostRecentDate = LocalDate.parse("2021-11-25");
 
         //when
-        Set<NbpExchangeRate> nbpExchangeRates = nbpExchangeRateDAO.getRecent();
+        List<NbpExchangeRate> nbpExchangeRates = nbpExchangeRateDAO.getRecent();
 
         //then
         assertAll(

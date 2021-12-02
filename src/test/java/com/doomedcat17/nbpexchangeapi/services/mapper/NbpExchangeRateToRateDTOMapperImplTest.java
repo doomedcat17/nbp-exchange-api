@@ -3,26 +3,16 @@ package com.doomedcat17.nbpexchangeapi.services.mapper;
 import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
-import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 class NbpExchangeRateToRateDTOMapperImplTest {
 
-    @Mock
-    private NbpExchangeRateRepository rateRepository;
 
-    @InjectMocks
-    private NbpExchangeRateToRateDTOMapperImpl nbpExchangeRateToRateDTOMapper;
+    private NbpExchangeRateToRateDTOMapperImpl nbpExchangeRateToRateDTOMapper = new NbpExchangeRateToRateDTOMapperImpl();
 
     @Test
     void shouldMapJPYToUSDRateAndReverse() {
