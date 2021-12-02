@@ -20,7 +20,7 @@ public class RatesController {
     public ExchangeRateDTO allRates(@PathVariable(name = "currencyCode") String currencyCode,
                                     @RequestParam(name = "effectiveDate", required = false, defaultValue = "") String effectiveDate) {
         currencyCode = currencyCode.toUpperCase();
-        return exchangeRatesService.getAllExchangeRatesForCodeAndDate(currencyCode, effectiveDate);
+        return exchangeRatesService. getAllExchangeRatesForCodeAndDate(currencyCode, effectiveDate);
     }
 
 
