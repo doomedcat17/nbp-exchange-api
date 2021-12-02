@@ -2,6 +2,7 @@ package com.doomedcat17.nbpexchangeapi.data;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Entity
 public class CurrencyTransaction {
@@ -23,4 +24,6 @@ public class CurrencyTransaction {
 
     @Column(scale = 6, precision = 10)
     private BigDecimal boughtAmount;
+
+    private Date date;
 }
