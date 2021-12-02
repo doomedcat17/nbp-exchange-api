@@ -1,6 +1,8 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider.table;
 
-import com.doomedcat17.nbpexchangeapi.data.nbp.client.DefaultNbpApiClient;
+import com.doomedcat17.nbpexchangeapi.services.nbp.client.DefaultNbpApiClient;
+import com.doomedcat17.nbpexchangeapi.services.nbp.provider.table.DefaultNbpTableProvider;
+import com.doomedcat17.nbpexchangeapi.services.nbp.provider.table.NbpTableProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Test;

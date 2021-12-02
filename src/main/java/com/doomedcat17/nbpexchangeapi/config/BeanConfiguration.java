@@ -11,7 +11,7 @@ public class BeanConfiguration {
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler threadPoolTaskScheduler
                 = new ThreadPoolTaskScheduler();
-        threadPoolTaskScheduler.setPoolSize(5);
+        threadPoolTaskScheduler.setPoolSize(2);
         threadPoolTaskScheduler.setThreadNamePrefix(
                 "TaskScheduler");
         return threadPoolTaskScheduler;

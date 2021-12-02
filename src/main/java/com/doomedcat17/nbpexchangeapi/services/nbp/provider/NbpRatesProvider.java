@@ -1,4 +1,4 @@
-package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
+package com.doomedcat17.nbpexchangeapi.services.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import java.time.LocalDate;

@@ -1,8 +1,8 @@
-package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
+package com.doomedcat17.nbpexchangeapi.services.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.data.nbp.provider.table.NbpTableProvider;
+import com.doomedcat17.nbpexchangeapi.services.nbp.provider.table.NbpTableProvider;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;

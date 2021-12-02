@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.task;
 
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.data.nbp.provider.NbpRatesProvider;
+import com.doomedcat17.nbpexchangeapi.services.nbp.provider.NbpRatesProvider;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import lombok.extern.slf4j.Slf4j;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.doomedcat17.nbpexchangeapi.data.converter;
+package com.doomedcat17.nbpexchangeapi.services.converter;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

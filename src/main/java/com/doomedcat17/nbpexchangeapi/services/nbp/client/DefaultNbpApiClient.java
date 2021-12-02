@@ -1,4 +1,4 @@
-package com.doomedcat17.nbpexchangeapi.data.nbp.client;
+package com.doomedcat17.nbpexchangeapi.services.nbp.client;
 
 import org.springframework.stereotype.Component;
 
