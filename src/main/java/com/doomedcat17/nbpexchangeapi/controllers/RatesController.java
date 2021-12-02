@@ -27,6 +27,8 @@ public class RatesController {
     @GetMapping("/{currencyCode}/{targetCurrencyCode}/recent")
     public ExchangeRateDTO recentRateForCode(@PathVariable(name = "currencyCode") String currencyCode,
                                         @PathVariable(name = "targetCurrencyCode") String targetCurrencyCode) {
+        currencyCode = currencyCode.toUpperCase();
+        targetCurrencyCode = targetCurrencyCode.toUpperCase();
         return exchangeRatesService.getRecentExchangeRate(currencyCode, targetCurrencyCode);
     }
 
@@ -34,12 +36,16 @@ public class RatesController {
     public ExchangeRateDTO rateForCodeAndDate(@PathVariable(name = "currencyCode") String currencyCode,
                                         @PathVariable(name = "targetCurrencyCode") String targetCurrencyCode,
                                                 @PathVariable(name = "date") String date) {
+        currencyCode = currencyCode.toUpperCase();
+        targetCurrencyCode = targetCurrencyCode.toUpperCase();
         return exchangeRatesService.getExchangeRateForCodeAndDate(currencyCode, targetCurrencyCode, date);
     }
 
     @GetMapping("/{currencyCode}/{targetCurrencyCode}/all")
     public ExchangeRateDTO allExchangeRatesForCodes(@PathVariable(name = "currencyCode") String currencyCode,
                                               @PathVariable(name = "targetCurrencyCode") String targetCurrencyCode) {
+        currencyCode = currencyCode.toUpperCase();
+        targetCurrencyCode = targetCurrencyCode.toUpperCase();
         return exchangeRatesService.getExchangeRatesForCodes(currencyCode, targetCurrencyCode);
     }
 
