@@ -10,6 +10,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@Table(name = "currency_transactions")
 public class CurrencyTransaction {
 
     @Id
