@@ -21,7 +21,7 @@ public class DefaultNbpTableProvider implements NbpTableProvider {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    public JsonNode getTable(String tableName) throws IOException {
+    public JsonNode getRecentTable(String tableName) throws IOException {
         String responseBody = nbpApiClient.requestResource(NBP_TABLES_RESOURCE_PATH+tableName);
         return retriveTableFromBody(responseBody);
     }

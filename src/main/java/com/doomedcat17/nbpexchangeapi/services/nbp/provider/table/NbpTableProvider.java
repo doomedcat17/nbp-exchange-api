@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 public interface NbpTableProvider {
 
-    JsonNode getTable(String tableName) throws IOException;
+    JsonNode getRecentTable(String tableName) throws IOException;
 
     JsonNode getTableFromDate(String tableName, LocalDate localDate) throws IOException;
 
