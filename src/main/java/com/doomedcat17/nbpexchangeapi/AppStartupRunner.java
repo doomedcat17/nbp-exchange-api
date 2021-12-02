@@ -8,11 +8,10 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
 import java.util.Set;
 
-@Profile({"dev", "prod"})
+@Profile({"!test"})
 @Component
 @Slf4j
 public class AppStartupRunner implements ApplicationRunner {
