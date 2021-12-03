@@ -14,7 +14,7 @@ public class TradeController {
 
     private final TradeService tradeService;
 
-    @GetMapping("/{sellCurrencyCode}/{buyCurrencyCode}/{buyAmount}")
+    @GetMapping("/{buyCurrencyCode}/{sellCurrencyCode}/{buyAmount}")
     public TransactionDto trade(@PathVariable(name = "sellCurrencyCode") String sellCurrencyCode,
                                             @PathVariable(name = "buyCurrencyCode") String buyCurrencyCode,
                                 @PathVariable(name = "buyAmount") String buyAmount) {

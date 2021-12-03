@@ -12,11 +12,12 @@ public class TransactionDto {
 
     private Date date;
 
+    private String buyCode;
+
+    private BigDecimal buyAmount;
+
     private String sellCode;
 
     private BigDecimal sellAmount;
 
-    private String buyCode;
-
-    private BigDecimal buyAmount;
 }

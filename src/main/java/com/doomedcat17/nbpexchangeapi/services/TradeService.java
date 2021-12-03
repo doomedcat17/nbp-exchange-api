@@ -16,18 +16,18 @@ public class TradeService {
 
     private final CurrencyTransactionRepository transactionRepository;
 
-    public TransactionDto buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal sellAmount) {
-        sellAmount = sellAmount.setScale(2, RoundingMode.HALF_EVEN);
+    public TransactionDto buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
+        buyAmount = buyAmount.setScale(2, RoundingMode.HALF_EVEN);
         TransactionDto transaction = new TransactionDto();
         ExchangeRateDTO exchangeRateDTO = exchangeRatesService
-                .getRecentExchangeRate(sellCurrencyCode, buyCurrencyCode);
+                .getRecentExchangeRate(buyCurrencyCode, sellCurrencyCode);
         RateDTO rate = exchangeRateDTO.getRates().get(0);
-        BigDecimal boughtAmount = rate.getRate().multiply(sellAmount);
-        boughtAmount = boughtAmount.setScale(2, RoundingMode.HALF_EVEN);
+        BigDecimal soldAmount = rate.getRate().multiply(buyAmount);
+        soldAmount = soldAmount.setScale(2, RoundingMode.HALF_EVEN);
         transaction.setBuyCode(buyCurrencyCode);
         transaction.setSellCode(sellCurrencyCode);
-        transaction.setSellAmount(sellAmount);
-        transaction.setBuyAmount(boughtAmount);
+        transaction.setSellAmount(soldAmount);
+        transaction.setBuyAmount(buyAmount);
         transaction.setDate(new Date(System.currentTimeMillis()));
         transactionRepository.addTransaction(transaction);
         return transaction;

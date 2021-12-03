@@ -6,9 +6,10 @@ public class SellRequestDto {
 
     private String sellCode;
 
-    private String buyCode;
-
     private String buyAmount;
+    
+    private String buyCode;
+    
 
     @JsonIgnore
     public String getEmptyParameterName() {
