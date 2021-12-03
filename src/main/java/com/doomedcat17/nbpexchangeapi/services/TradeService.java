@@ -7,7 +7,9 @@ import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class TradeService {
@@ -31,6 +33,17 @@ public class TradeService {
         transaction.setDate(new Date(System.currentTimeMillis()));
         transactionRepository.addTransaction(transaction);
         return transaction;
+    }
+
+    public List<TransactionDto> getTransactionsFromGivenDate(String date) {
+        LocalDate transactionDate = LocalDate.parse(date);
+        return transactionRepository.getAllByDate(transactionDate);
+    }
+
+    public List<TransactionDto> getTransactionsFromGivenDates(String startDate, String endDate) {
+        LocalDate transactionStartDate = LocalDate.parse(startDate);
+        LocalDate transactionEndDate= LocalDate.parse(endDate);
+        return transactionRepository.getAllBetweenDates(transactionStartDate, transactionEndDate);
     }
 
     public TradeService(ExchangeRatesService exchangeRatesService, CurrencyTransactionRepository transactionRepository) {

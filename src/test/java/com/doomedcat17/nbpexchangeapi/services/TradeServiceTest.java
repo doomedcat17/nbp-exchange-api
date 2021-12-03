@@ -38,18 +38,18 @@ class TradeServiceTest {
         //given
         String buyCurrencyCode = "USD";
         String sellCurrencyCode = "PLN";
-        BigDecimal sellAmount = new BigDecimal("40");
+        BigDecimal buyAmount = new BigDecimal("40");
 
         //when
         TransactionDto transactionDto =
-                tradeService.buyCurrency(buyCurrencyCode, sellCurrencyCode, sellAmount);
+                tradeService.buyCurrency(buyCurrencyCode, sellCurrencyCode, buyAmount);
 
         //then
         assertAll(
                 ()-> assertEquals("PLN", transactionDto.getSellCode()),
                 ()-> assertEquals("USD", transactionDto.getBuyCode()),
-                ()-> assertEquals(new BigDecimal("40.00"), transactionDto.getSellAmount()),
-                ()-> assertEquals(new BigDecimal("9.78"), transactionDto.getBuyAmount()),
+                ()-> assertEquals(new BigDecimal("163.60"), transactionDto.getSellAmount()),
+                ()-> assertEquals(new BigDecimal("40.00"), transactionDto.getBuyAmount()),
                 () -> assertEquals(1, currencyTransactionDao.count())
         );
     }

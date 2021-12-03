@@ -38,7 +38,6 @@ public class NbpExchangeRateRepository {
         return nbpExchangeRateDAO.getAllByCurrencyCode(currencyCode);
     }
 
-
     public void removeAllOlderThanWeek() {
         nbpExchangeRateDAO.deleteAllByEffectiveDateBefore(workWeekStartDateProvider.get(LocalDate.now()));
     }

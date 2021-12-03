@@ -7,6 +7,7 @@ import com.doomedcat17.nbpexchangeapi.services.TradeService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/trade")
@@ -19,6 +20,17 @@ public class TradeController {
                                             @PathVariable(name = "buyCurrencyCode") String buyCurrencyCode,
                                 @PathVariable(name = "buyAmount") String buyAmount) {
         return tradeService.buyCurrency(buyCurrencyCode.toUpperCase(), sellCurrencyCode.toUpperCase(), new BigDecimal(buyAmount));
+    }
+
+    @GetMapping("/history/{date}")
+    public List<TransactionDto> getAllTransactionsFromDate(@PathVariable(name = "date") String date) {
+        return tradeService.getTransactionsFromGivenDate(date);
+    }
+
+    @GetMapping("/history/{startDate}/{endDate}")
+    public List<TransactionDto> getAllTransactionsFromDates(@PathVariable(name = "startDate") String startDate,
+                                                            @PathVariable(name = "endDate") String endDate) {
+        return tradeService.getTransactionsFromGivenDates(startDate, endDate);
     }
 
     @PostMapping
