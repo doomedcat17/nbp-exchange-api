@@ -1,4 +1,6 @@
-package com.doomedcat17.nbpexchangeapi.data.nbp.client;
+package com.doomedcat17.nbpexchangeapi.services.nbp.client;
+
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+@Component
 public class DefaultNbpApiClient implements NbpApiClient {
 
     private final String NBP_API_ROOT = "http://api.nbp.pl/api/";
