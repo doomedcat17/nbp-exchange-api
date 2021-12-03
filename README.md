@@ -33,12 +33,14 @@ Teraz wystarczy, że wykonasz poniższą komendę i aplikacja będzie gotowa do 
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://root:rootpass@localhost:3306/exchangeDb
 ```
+**Co jeśli mam MySQL?**
 
 Jeżeli posiadasz już jakąś instancję bazy, możesz ją wykorzystać podając podmieniając URL w poniższej komendzie:
 
 ```
-git clone https://github.com/doomedcat17/nbp-exchange-api.git
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql:{TU URL POŁĄCZENIA}
 ```
+
 A następnie wykonaj poniższą komendę:
 
 ```
