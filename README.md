@@ -6,9 +6,9 @@ Prosta RESTowa aplikacja do pobierania danych o kursie walut bezpośrednio z [NB
 - [Dokumentacja](#dokumentacja)
   - [Inicjalizacja](#inicjalizacja)
   - [Endpointy](#endpointy)
-    - [Pobieranie kursów](#pobieranie-kursw)
+    - [Pobieranie kursów](#pobieranie-kursów)
     - [Wymiana walut](#wymiana-walut)
-- [Stack](#getting-data)
+- [Stack](#stack)
 
 # Uruchamianie
 
@@ -49,7 +49,7 @@ Aplikacja powinna już być gotowa do użycia.
 
 # Dokumentacja
 
-##Inicjalizacja
+## Inicjalizacja
 
 Kiedy uruchomimy aplikację rozpocznie się proces inicjalizacji. Aplikacja utworzy strukturę bazy danych oraz 
 pobierze dane o kursach z **ostatnich siedmiu dni roboczych. Z dzisiaj włącznie.** 
@@ -57,9 +57,9 @@ Jeśli proces się nie powiedzie (brak połączenia), aplikacja będzie ponawia�
 
 Po tym procesie, będzie można zacząć zabawę z API :D
 
-##Endpointy
+## Endpointy
 
-###Pobieranie kursów
+### Pobieranie kursów
 
 **Endpoint:** `/api/rates/{currencyCode}/recent`  
 **Metoda:** `GET`  
@@ -389,7 +389,7 @@ Zwraca wszystkie kursy wymiany dolara na złotówki:
 </p>
 </details>
 
-###Wymiana walut
+### Wymiana walut
 
 **Endpoint:** `/api/trade/{buyCurrencyCode}/{sellCurrencyCode}/{buyAmount}`  
 **Metoda:** `GET`  
@@ -440,11 +440,9 @@ Zwraca ilość zakupionych dolarów za złotówki:
 **Ciało zapytania:**
 ```json
 {
-    "date": "2021-12-03T03:22:18.014+00:00",
-    "buyCode": "PLN",
-    "buyAmount": 1000.00,
     "sellCode": "USD",
-    "sellAmount": 246.15
+    "buyCode": "PLN",
+    "buyAmount": "1000"
 }
 ```
 
@@ -463,7 +461,7 @@ Zwraca ilość zakupionych złotówek za dolary
 </details>
 
 
-#Stack
+# Stack
 Java 17, 
 Spring Boot, JUnit, Jackson, Mockito, MySQL, H2
 
