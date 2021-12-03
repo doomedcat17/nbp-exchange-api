@@ -12,6 +12,8 @@ Prosta RESTowa aplikacja do pobierania danych o kursie walut bezpośrednio z [NB
 
 # Uruchamianie
 
+**Wymagania:** Java 17, Maven, MySQL
+
 Skorzystaj z gita, aby sklonować repozytorium na dysk:
 
 ```
@@ -20,7 +22,7 @@ git clone https://github.com/doomedcat17/nbp-exchange-api.git
 
 Do uruchomienia wymagana jest baza MySQL. 
 Jeśli masz zainstalowanego Dockera, możesz wykorzystać `docker-compose.yaml`
-do szybkiego postawienia kontenera z MySql. 
+do szybkiego postawienia kontenera z MySQL. 
 
 W tym celu wykonaj komendę w terminalu:
 
@@ -459,6 +461,12 @@ Zwraca ilość zakupionych złotówek za dolary
 ```
 </p>
 </details>
+
+
+#Stack
+Java 17, 
+Spring Boot, JUnit, Jackson, Mockito, MySQL, H2
+
 
 
 
