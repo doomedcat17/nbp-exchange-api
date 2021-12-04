@@ -1,16 +1,16 @@
 package com.doomedcat17.nbpexchangeapi.repository;
 
-import com.doomedcat17.nbpexchangeapi.TestDataProvider;
-import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDAO;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyTransactionDao;
 import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDAO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -20,33 +20,21 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles(profiles = "test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@ActiveProfiles("test")
 class CurrencyTransactionRepositoryTest {
 
-    private final NbpExchangeRateDAO nbpExchangeRateDAO;
+    @Autowired
+    private CurrencyTransactionDao currencyTransactionDao;
 
-    private final CurrencyDAO currencyDAO;
-
-    private final CurrencyTransactionDao currencyTransactionDao;
-
-    private final CurrencyTransactionRepository currencyTransactionRepository;
+    @Autowired
+    private CurrencyTransactionRepository currencyTransactionRepository;
 
     @Test
     void shouldAddTransaction() {
 
         //given
-        Currency usd = new Currency();
-        usd.setName("Dolar");
-        usd.setCode("USD");
-
-        Currency pln = new Currency();
-        pln.setName("Złoty");
-        pln.setCode("PLN");
-
-        currencyDAO.save(usd);
-        currencyDAO.save(pln);
-
         TransactionDto transactionDto = new TransactionDto();
         transactionDto.setDate(new Date(System.currentTimeMillis()));
         transactionDto.setSellAmount(new BigDecimal("12"));
@@ -63,8 +51,6 @@ class CurrencyTransactionRepositoryTest {
 
     @Test
     void shouldReturnLatestTransaction() {
-        //given
-        nbpExchangeRateDAO.saveAll(TestDataProvider.sampleExchangeRates());
 
         TransactionDto expectedTransactionDto = new TransactionDto();
         expectedTransactionDto.setDate(new Date(System.currentTimeMillis()));
@@ -92,9 +78,8 @@ class CurrencyTransactionRepositoryTest {
 
     @Test
     void shouldReturnTransactionsFromGivenDate() {
-        //given
-        nbpExchangeRateDAO.saveAll(TestDataProvider.sampleExchangeRates());
 
+        //given
         Date expectedDate = Date.valueOf(LocalDate.parse("2020-07-11"));
 
         TransactionDto expectedTransactionDto1 = new TransactionDto();
@@ -140,9 +125,8 @@ class CurrencyTransactionRepositoryTest {
 
     @Test
     void shouldReturnAllBetweenGivenDates() {
-        //given
-        nbpExchangeRateDAO.saveAll(TestDataProvider.sampleExchangeRates());
 
+        //given
         LocalDate startDate = LocalDate.parse("2021-12-01");
         LocalDate endDate = LocalDate.parse("2021-12-03");
 
@@ -196,14 +180,5 @@ class CurrencyTransactionRepositoryTest {
                         !transactionDto.getDate().before(Date.valueOf(startDate))
                                 && !transactionDto.getDate().after(Date.valueOf(endDate))));
         assertEquals(3, foundTransactions.size());
-    }
-
-
-    @Autowired
-    public CurrencyTransactionRepositoryTest(NbpExchangeRateDAO nbpExchangeRateDAO, CurrencyDAO currencyDAO, CurrencyTransactionDao currencyTransactionDao, CurrencyTransactionRepository currencyTransactionRepository) {
-        this.nbpExchangeRateDAO = nbpExchangeRateDAO;
-        this.currencyDAO = currencyDAO;
-        this.currencyTransactionDao = currencyTransactionDao;
-        this.currencyTransactionRepository = currencyTransactionRepository;
     }
 }

@@ -43,6 +43,16 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(error, httpStatus);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> notFound() {
+        ErrorResponse error = new ErrorResponse();
+        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+        error.setTimestamp(LocalDateTime.now());
+        error.setMessage("Not found");
+        error.setStatus(httpStatus.value());
+        return new ResponseEntity<>(error, httpStatus);
+    }
+
 
     static class ErrorResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")

@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.repository.dao;
 
 import com.doomedcat17.nbpexchangeapi.data.Currency;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CurrencyDAO extends CrudRepository<Currency, String> {
+public interface CurrencyDAO extends JpaRepository<Currency, String> {
 }

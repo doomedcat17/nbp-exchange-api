@@ -10,27 +10,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles(profiles = "test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@ActiveProfiles("test")
 class TradeServiceTest {
 
-    private final TradeService tradeService;
+    @Autowired
+    private TradeService tradeService;
 
-    private final CurrencyTransactionDao currencyTransactionDao;
-
-    private final NbpExchangeRateRepository nbpExchangeRateRepository;
-
-    @BeforeEach
-    void init() {
-        TestDataProvider.sampleExchangeRates()
-                .forEach(nbpExchangeRateRepository::add);
-    }
+    @Autowired
+    private CurrencyTransactionDao currencyTransactionDao;
 
     @Test
     void shouldReturnTransactionDto() {
@@ -56,11 +52,4 @@ class TradeServiceTest {
 
 
 
-
-    @Autowired
-    public TradeServiceTest(TradeService tradeService, CurrencyTransactionDao currencyTransactionDao, NbpExchangeRateRepository nbpExchangeRateRepository) {
-        this.tradeService = tradeService;
-        this.currencyTransactionDao = currencyTransactionDao;
-        this.nbpExchangeRateRepository = nbpExchangeRateRepository;
-    }
 }

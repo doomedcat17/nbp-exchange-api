@@ -23,11 +23,11 @@ public class NbpExchangeRateRepository {
     private final CurrencyDAO currencyDAO;
 
     public synchronized void add(NbpExchangeRate nbpExchangeRate) {
-        NbpExchangeRate prestentExchangeRate =
+        Optional<NbpExchangeRate> prestentExchangeRate =
                 getByCurrencyCodeAndEffectiveDate(
                         nbpExchangeRate.getCurrency().getCode(),
                         nbpExchangeRate.getEffectiveDate());
-        if (prestentExchangeRate == null) {
+        if (prestentExchangeRate.isEmpty()) {
             Optional<Currency> currency = currencyDAO.findById(nbpExchangeRate.getCurrency().getCode());
             currency.ifPresent(nbpExchangeRate::setCurrency);
             nbpExchangeRateDAO.save(nbpExchangeRate);
@@ -50,19 +50,21 @@ public class NbpExchangeRateRepository {
         return nbpExchangeRateDAO.getRecent();
     }
 
-    public NbpExchangeRate getByCurrencyCodeAndEffectiveDate(String currencyCode, LocalDate effectiveDate) {
-        return nbpExchangeRateDAO
+    public Optional<NbpExchangeRate> getByCurrencyCodeAndEffectiveDate(String currencyCode, LocalDate effectiveDate) {
+        NbpExchangeRate foundNbpExchangeRate = nbpExchangeRateDAO
                 .getByCurrencyCodeAndEffectiveDate(currencyCode, effectiveDate);
+        if (foundNbpExchangeRate == null) return Optional.empty();
+        return Optional.of(foundNbpExchangeRate);
     }
 
     public List<NbpExchangeRate> getAllByEffectiveDate(LocalDate effectiveDate) {
         return nbpExchangeRateDAO.getAllByEffectiveDate(effectiveDate);
     }
 
-    public NbpExchangeRate getMostRecentByCurrencyCode(String currencyCode) {
+    public Optional<NbpExchangeRate> getMostRecentByCurrencyCode(String currencyCode) {
         List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateDAO.getMostRecentByCode(currencyCode, PageRequest.of(0, 1));
-        if (!foundExchangeRates.isEmpty()) return foundExchangeRates.get(0);
-        else return null;
+        if (!foundExchangeRates.isEmpty()) return Optional.of(foundExchangeRates.get(0));
+        else return Optional.empty();
     }
 
     public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDAO currencyDAO) {

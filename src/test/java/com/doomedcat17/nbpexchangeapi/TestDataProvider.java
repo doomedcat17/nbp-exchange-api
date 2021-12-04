@@ -39,6 +39,10 @@ public class TestDataProvider {
         LocalDate date = LocalDate.parse("2021-11-30");
         while (date.isAfter(LocalDate.parse("2021-11-18"))) {
             if (!date.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !date.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+                System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+date+", "+new BigDecimal("0.36")+", '"+jpyCurrency.getCode()+"');");
+                System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+date+", "+new BigDecimal("4.09")+", '"+usdCurrency.getCode()+"');");
+                System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+date+", "+new BigDecimal("3.00")+", '"+audCurrency.getCode()+"');");
+                System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+date+", "+new BigDecimal("1.00")+", '"+plnCurrency.getCode()+"');");
                 exchangeRates.addAll(
                         List.of(
                                 new NbpExchangeRate(jpyCurrency, new BigDecimal("0.36"), date),
@@ -49,6 +53,11 @@ public class TestDataProvider {
             }
             date = date.minusDays(1);
         }
+
+        System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+LocalDate.parse("2021-07-02")+", "+new BigDecimal("4.20")+", '"+usdCurrency.getCode()+"');");
+        System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+LocalDate.parse("2021-09-02")+", "+new BigDecimal("4.09")+", '"+usdCurrency.getCode()+"');");
+        System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+LocalDate.parse("2021-11-25")+", "+new BigDecimal("0.044308")+", '"+afnCurrency.getCode()+"');");
+        System.out.println("INSERT INTO exchangeDb.nbp_exchange_rates (id, effective_date, mid_rate_inpln, currency_code) VALUES (null, "+LocalDate.parse("2021-09-02")+", "+new BigDecimal("3.00")+", '"+audCurrency.getCode()+"');");
 
         exchangeRates.addAll(
                 List.of(

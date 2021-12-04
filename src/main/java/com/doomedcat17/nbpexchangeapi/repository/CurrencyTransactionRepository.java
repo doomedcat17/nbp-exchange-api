@@ -6,7 +6,6 @@ import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDAO;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyTransactionDao;
 import org.springframework.stereotype.Repository;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
