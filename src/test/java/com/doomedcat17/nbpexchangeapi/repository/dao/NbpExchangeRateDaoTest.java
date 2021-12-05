@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -108,7 +107,7 @@ class NbpExchangeRateDaoTest {
         nbpExchangeRateDAO.deleteAllByEffectiveDateBefore(date);
 
         //then
-        assertEquals(sizeBefore-7, nbpExchangeRateDAO.count());
+        assertEquals(sizeBefore - 7, nbpExchangeRateDAO.count());
     }
 
     @Test

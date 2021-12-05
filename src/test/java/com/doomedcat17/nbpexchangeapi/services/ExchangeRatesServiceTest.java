@@ -50,8 +50,11 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         //given
         String currencyCode = "XD";
 
+        //when
+        Optional<ExchangeRateDTO> foundExchangeRate = getRecentExchangeRatesForCode(currencyCode);
+
         //then
-        assertThrows(CurrencyNotFoundException.class, () -> getRecentExchangeRatesForCode(currencyCode));
+        assertTrue(foundExchangeRate.isEmpty());
     }
 
     @Test

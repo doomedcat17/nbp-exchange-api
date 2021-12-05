@@ -2,13 +2,21 @@
 
 Prosta RESTowa aplikacja do pobierania danych o kursie walut bezpośrednio z [NBP](http://api.nbp.pl/).
 
+- [Opis](#opis)
 - [Uruchamianie](#uruchamianie)
 - [Dokumentacja](#dokumentacja)
   - [Inicjalizacja](#inicjalizacja)
   - [Endpointy](#endpointy)
     - [Pobieranie kursów](#pobieranie-kursów)
     - [Wymiana walut](#wymiana-walut)
+    - [Historia wymiany walut](#historia-wymiany-walut)
+    - [Komunikaty błędów](#komunikaty-bledow)
 - [Stack](#stack)
+
+# Opis
+Aplikacja bazuje na NBP API, a konkretnie na tablach A oraz B, więc *de facto* korzysta z kursów uśrednionych.
+Zależało, aby były dostępne kursy wszystkich walut. Kursy są przechowywane do siedmiu dni roboczych i są aktualizowane w każdy dzień roboczy o godzinie 12:31.
+Wynika to z tego, że mniej więcej o tej godzinie NBP aktualizuje swoją bazę danych.
 
 # Uruchamianie
 
@@ -29,20 +37,13 @@ W tym celu wykonaj komendę w terminalu:
 ```
 docker compose up
 ```
-Teraz wystarczy, że wykonasz poniższą komendę i aplikacja będzie gotowa do użycia!
+Teraz wystarczy, że wykonasz poniższą komendę:
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://root:rootpass@localhost:3306/exchangeDb
 ```
 **Co jeśli mam MySQL?**
 
 Jeżeli posiadasz już jakąś instancję bazy, możesz ją wykorzystać podając podmieniając URL w poniższej komendzie:
-
-```
-mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql:{TU URL POŁĄCZENIA}
-```
-
-A następnie wykonaj poniższą komendę:
-
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql:{TU URL POŁĄCZENIA}
 ```
@@ -67,7 +68,7 @@ Po tym procesie, będzie można zacząć zabawę z API :D
 **Metoda:** `GET`  
 **Opis:** zwraca aktualne kursy sprzedaży podanej waluty  
 **Parametry:**
-- `currencyCode`: kod waluty
+- `{currencyCode}`: kod waluty
 <details><summary><b>Przykład</b></summary>
 <p>
 
@@ -137,8 +138,8 @@ Zwraca aktualne kursy sprzedaży dolara:
 **Metoda:** `GET`  
 **Opis:** zwraca **wszyskie** kursy sprzedaży podanej waluty  
 **Parametry:**
-- `currencyCode`: kod waluty
-- `effectiveDate`: opcjonalny parametr, zwraca wszystkie kursy z danego dnia
+- `{currencyCode}`: kod waluty
+- `effectiveDate`: opcjonalny parametr zapytania, zwraca wszystkie kursy z danego dnia
 
 <details><summary><b>Przykład 1</b></summary>
 <p>
@@ -273,8 +274,8 @@ Zwraca wszystkie kursy sprzedaży dolara z dnia 2021-12-02:
 **Metoda:** `GET`  
 **Opis:** zwraca aktualny kurs dla podanych walut  
 **Parametry:**
-- `sourceCurrencyCode`: kod waluty, którą wymieniamy
-- `targetCurrencyCode`: kod waluty, na którą chcemy wymienić
+- `{sourceCurrencyCode}`: kod waluty, którą wymieniamy
+- `{targetCurrencyCode}`: kod waluty, na którą chcemy wymienić
 
 <details><summary><b>Przykład</b></summary>
 <p>
@@ -461,6 +462,102 @@ Zwraca ilość zakupionych złotówek za dolary
 ```
 </p>
 </details>
+
+### Historia wymiany walut
+
+**Endpoint:** `/api/trade/history/{date}`  
+**Metoda:** `GET`  
+**Opis:** zwraca wszystkie transakcje z danego dnia
+**Parametry:**
+- `{date}`: data, z której chcemy uzyskać historię transakcji
+
+<details><summary><b>Przykład</b></summary>
+<p>
+
+**Zapytanie:**
+```
+/api/trade/history/2021-12-03
+```
+
+Zwraca wszystkie transakcje z dnia 2021-12-03:
+
+```json
+[
+  {
+    "date": "2021-12-03T01:45:41.000+00:00",
+    "buyCode": "PLN",
+    "buyAmount": 1000.00,
+    "sellCode": "USD",
+    "sellAmount": 245.98
+  },
+  {
+    "date": "2021-12-03T01:46:19.000+00:00",
+    "buyCode": "PLN",
+    "buyAmount": 250.00,
+    "sellCode": "USD",
+    "sellAmount": 61.50
+  },
+  {
+    "date": "2021-12-03T01:46:23.000+00:00",
+    "buyCode": "PLN",
+    "buyAmount": 212.00,
+    "sellCode": "USD",
+    "sellAmount": 52.15
+  }
+]
+```
+</p>
+</details>
+
+**Endpoint:** `/api/trade/history/{startDate}/{endDate}`  
+**Metoda:** `GET`  
+**Opis:** zwraca wszystkie transakcje z danego zakresu dat
+**Parametry:**
+- `{startDate}`: początkowa data zakresu
+- `{startDate}`: końcowa data zakresu
+
+<details><summary><b>Przykład</b></summary>
+<p>
+
+**Zapytanie:**
+```
+/api/trade/history/2021-12-01/2021-12-03
+```
+
+Zwraca wszystkie transakcje z zakresu od 2021-12-01 do 2021-12-03:
+
+```json
+[
+  {
+    "date": "2021-12-01T01:48:59.000+00:00",
+    "buyCode": "AUD",
+    "buyAmount": 300.00,
+    "sellCode": "USD",
+    "sellAmount": 211.62
+  },
+  {
+    "date": "2021-12-02T01:49:04.000+00:00",
+    "buyCode": "AUD",
+    "buyAmount": 300.00,
+    "sellCode": "JPY",
+    "sellAmount": 23977.26
+  },
+  {
+    "date": "2021-12-03T01:49:15.000+00:00",
+    "buyCode": "AFN",
+    "buyAmount": 300.00,
+    "sellCode": "RUB",
+    "sellAmount": 231.00
+  }
+]
+```
+</p>
+</details>
+
+### Historia wymiany walut
+
+W przypadku braku danych, zwracane jest pusta odpowiedź o kodzie `404 Not Found`.  
+W przypadku nieprawidłowego formatu daty, zwracany jest stosowny komunikat o kodzie `400 Bad Request`.
 
 
 # Stack

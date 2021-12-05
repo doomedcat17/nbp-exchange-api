@@ -114,7 +114,7 @@ public class ExchangeRatesService {
     private List<RateDTO> getRecentRatesForCurrency(String sourceCurrencyCode) {
         List<RateDTO> rateDTOS = new ArrayList<>();
         Optional<NbpExchangeRate> foundSourceExchangeRate = nbpExchangeRateRepository.getMostRecentByCurrencyCode(sourceCurrencyCode);
-        if (foundSourceExchangeRate.isEmpty()) throw new CurrencyNotFoundException(sourceCurrencyCode);
+        if (foundSourceExchangeRate.isEmpty()) return List.of();
         List<NbpExchangeRate> recentExchangeRates = nbpExchangeRateRepository
                 .getMostRecent();
 

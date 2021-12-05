@@ -44,15 +44,15 @@ public class CurrencyTransactionRepository {
                 .collect(Collectors.toList());
     }
 
-    public List<TransactionDto> getAllBetweenDates(LocalDate startDate, LocalDate endDate) {
-        java.util.Date startDateEnd = Date.from(startDate.atStartOfDay()
+    public List<TransactionDto> getAllFromGivenDates(LocalDate startDate, LocalDate endDate) {
+        java.util.Date endDateEnd = Date.from(endDate.atStartOfDay()
                         .plusHours(23)
                         .plusMinutes(59)
                         .plusSeconds(59)
                         .atZone(ZoneId.systemDefault())
                 .toInstant());
         List<CurrencyTransaction> currencyTransactions =
-                currencyTransactionDao.getAllBetweenDates(startDateEnd, Date.valueOf(endDate));
+                currencyTransactionDao.getAllBetweenDates(Date.valueOf(startDate), endDateEnd);
         return currencyTransactions.stream()
                 .map(TransactionDto::applyCurrencyTransaction)
                 .collect(Collectors.toList());

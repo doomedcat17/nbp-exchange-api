@@ -3,10 +3,7 @@ package com.doomedcat17.nbpexchangeapi.services;
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.exceptions.NotFoundException;
 import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -49,7 +46,7 @@ public class TradeService {
     public List<TransactionDto> getTransactionsFromGivenDates(String startDate, String endDate) {
         LocalDate transactionStartDate = LocalDate.parse(startDate);
         LocalDate transactionEndDate= LocalDate.parse(endDate);
-        return transactionRepository.getAllBetweenDates(transactionStartDate, transactionEndDate);
+        return transactionRepository.getAllFromGivenDates(transactionStartDate, transactionEndDate);
     }
 
     public TradeService(ExchangeRatesService exchangeRatesService, CurrencyTransactionRepository transactionRepository) {
