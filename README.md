@@ -10,7 +10,7 @@ Prosta RESTowa aplikacja do pobierania danych o kursie walut bezpośrednio z [NB
     - [Pobieranie kursów](#pobieranie-kursów)
     - [Wymiana walut](#wymiana-walut)
     - [Historia wymiany walut](#historia-wymiany-walut)
-    - [Komunikaty błędów](#komunikaty-bledow)
+    - [Komunikaty błędów](#komunikaty-błędów)
 - [Stack](#stack)
 
 # Opis
