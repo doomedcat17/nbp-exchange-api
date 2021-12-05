@@ -41,7 +41,6 @@ Teraz wystarczy, że wykonasz poniższą komendę:
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://root:rootpass@localhost:3306/exchangeDb
 ```
-
 **Co jeśli mam MySQL?**
 
 Jeżeli posiadasz już jakąś instancję bazy, możesz ją wykorzystać podając podmieniając URL w poniższej komendzie:
