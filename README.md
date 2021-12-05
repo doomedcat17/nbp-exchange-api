@@ -28,20 +28,28 @@ Skorzystaj z gita, aby sklonować repozytorium na dysk:
 git clone https://github.com/doomedcat17/nbp-exchange-api.git
 ```
 
+A następnie przejdź do folderu z aplikacją:
+
+```
+cd nbp-exchange-api
+```
+
 Do uruchomienia wymagana jest baza MySQL. 
+
+### Docker
 Jeśli masz zainstalowanego Dockera, możesz wykorzystać `docker-compose.yaml`
 do szybkiego postawienia kontenera z MySQL. 
 
 W tym celu wykonaj komendę w terminalu:
 
 ```
-docker compose up
+docker compose-up -d
 ```
 Teraz wystarczy, że wykonasz poniższą komendę:
 ```
 mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://root:rootpass@localhost:3306/exchangeDb
 ```
-**Co jeśli mam MySQL?**
+### Co jeśli mam już MySQL?
 
 Jeżeli posiadasz już jakąś instancję bazy, możesz ją wykorzystać podając podmieniając URL w poniższej komendzie:
 ```
