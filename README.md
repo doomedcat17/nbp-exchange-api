@@ -43,7 +43,7 @@ do szybkiego postawienia kontenera z MySQL.
 W tym celu wykonaj komendę w terminalu:
 
 ```
-docker compose-up -d
+docker-compose up -d
 ```
 Teraz wystarczy, że wykonasz poniższą komendę:
 ```
