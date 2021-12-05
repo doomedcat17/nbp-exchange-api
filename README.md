@@ -13,6 +13,8 @@ Prosta RESTowa aplikacja do pobierania danych o kursie walut bezpośrednio z [NB
     - [Komunikaty błędów](#komunikaty-błędów)
 - [Stack](#stack)
 
+**Aplikacja jest dostępna na [Heroku](https://nbp-exchange-api.herokuapp.com/api/rates/pln/recent)! (działa na darmowym hostingu MySQL, więc prędkość nie powala :P)**
+
 # Opis
 Aplikacja bazuje na NBP API, a konkretnie na tablach A oraz B, więc *de facto* korzysta z kursów uśrednionych.
 Zależało, aby były dostępne kursy wszystkich walut. Kursy są przechowywane do siedmiu dni roboczych i są aktualizowane w każdy dzień roboczy o godzinie 12:31.
