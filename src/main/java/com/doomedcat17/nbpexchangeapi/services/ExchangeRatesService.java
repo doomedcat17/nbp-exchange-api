@@ -3,7 +3,6 @@ package com.doomedcat17.nbpexchangeapi.services;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
-import com.doomedcat17.nbpexchangeapi.exceptions.CurrencyNotFoundException;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import com.doomedcat17.nbpexchangeapi.services.mapper.NbpExchangeRateToRateDTOMapper;
 import org.springframework.stereotype.Service;
@@ -58,6 +57,7 @@ public class ExchangeRatesService {
     }
 
     public Optional<ExchangeRateDTO> getRecentExchangeRate(String sourceCurrencyCode, String targetCurrencyCode) {
+        if (sourceCurrencyCode.equals(targetCurrencyCode)) return Optional.empty();
         Optional<NbpExchangeRate> sourceExchangeRate =
                 nbpExchangeRateRepository.getMostRecentByCurrencyCode(sourceCurrencyCode);
         Optional<NbpExchangeRate> targetExchangeRate =
@@ -75,6 +75,7 @@ public class ExchangeRatesService {
     }
 
     public Optional<ExchangeRateDTO> getExchangeRateForCodeAndDate(String sourceCurrencyCode, String targetCurrencyCode, String textDate) {
+        if (sourceCurrencyCode.equals(targetCurrencyCode)) return Optional.empty();
         LocalDate date = LocalDate.parse(textDate);
 
         Optional<NbpExchangeRate> sourceExchangeRate =
@@ -93,6 +94,8 @@ public class ExchangeRatesService {
     }
 
     public Optional<ExchangeRateDTO> getExchangeRatesForCodes(String sourceCurrencyCode, String targetCurrencyCode) {
+        if (sourceCurrencyCode.equals(targetCurrencyCode)) return Optional.empty();
+
         List<NbpExchangeRate> sourceExchangeRates = nbpExchangeRateRepository.getAllByCurrencyCode(sourceCurrencyCode);
         if (sourceExchangeRates.isEmpty()) return Optional.empty();
 

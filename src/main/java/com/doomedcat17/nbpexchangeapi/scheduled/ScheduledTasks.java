@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-@Profile({"dev", "prod"})
+@Profile({"!test"})
 @Component
 @Slf4j
 public class ScheduledTasks {

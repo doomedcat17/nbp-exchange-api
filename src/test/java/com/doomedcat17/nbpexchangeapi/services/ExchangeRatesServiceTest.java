@@ -10,6 +10,7 @@ import com.doomedcat17.nbpexchangeapi.services.mapper.NbpExchangeRateToRateDTOMa
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import java.math.BigDecimal;
@@ -21,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @ActiveProfiles("test")
 class ExchangeRatesServiceTest extends ExchangeRatesService {
 
     @Test
-    @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"})
     void shouldReturnMostRecentRatesForGivenCode() {
 
         //given
@@ -40,7 +41,12 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         ExchangeRateDTO exchangeRateDTO = foundExchangeRateDTO.get();
         assertEquals(currencyCode, exchangeRateDTO.getCode());
         List<RateDTO> rates = exchangeRateDTO.getRates();
+
         assertEquals(4, rates.size());
+        assertTrue(rates.stream().allMatch(
+                rateDTO ->
+                        rateDTO.getEffectiveDate().equals(LocalDate.parse("2021-11-30"))
+                        || (rateDTO.getEffectiveDate().equals(LocalDate.parse("2021-11-25")) && rateDTO.getCode().equals("AFN"))));
         assertTrue(rates.stream().noneMatch(rate -> rate.getCode().equals("USD")));
     }
 
