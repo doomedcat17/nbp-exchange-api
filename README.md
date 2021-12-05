@@ -434,7 +434,7 @@ Zwraca ilość zakupionych dolarów za złotówki:
 
 **Endpoint:** `/api/trade`  
 **Metoda:** `POST`  
-**Opis:** jak wyżej, ale przyjmuje JSONa
+**Opis:** jak wyżej, ale przyjmuje JSONa  
 **Ciało zapytania:**
 - `sellCode`: kod waluty, którą sprzedajemy
 - `buyCode`: kod waluty, którą kupujemy
