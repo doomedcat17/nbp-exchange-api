@@ -20,10 +20,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @ActiveProfiles("test")
-class NbpExchangeRateDAOTest {
+class NbpExchangeRateDaoTest {
 
     @Autowired
-    private NbpExchangeRateDAO nbpExchangeRateDAO;
+    private NbpExchangeRateDao nbpExchangeRateDAO;
 
     @Test
     void shouldReturnMostRecent() {
@@ -103,13 +103,25 @@ class NbpExchangeRateDAOTest {
         //given
         LocalDate date = LocalDate.parse("2021-11-22");
         long sizeBefore = nbpExchangeRateDAO.count();
-        List<NbpExchangeRate> exchangeRates = nbpExchangeRateDAO.findAll();
 
         //when
         nbpExchangeRateDAO.deleteAllByEffectiveDateBefore(date);
 
         //then
         assertEquals(sizeBefore-7, nbpExchangeRateDAO.count());
+    }
+
+    @Test
+    void shouldGetAllByEffectiveDate() {
+        //given
+        LocalDate date = LocalDate.parse("2021-11-25");
+
+        //when
+        List<NbpExchangeRate> exchangeRates = nbpExchangeRateDAO.getAllByEffectiveDate(date);
+
+        //then
+        assertEquals(5, exchangeRates.size());
+        assertTrue(exchangeRates.stream().allMatch(nbpExchangeRate -> nbpExchangeRate.getEffectiveDate().equals(date)));
     }
 
 }

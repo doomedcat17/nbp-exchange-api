@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CurrencyTransactionDao extends JpaRepository<CurrencyTransaction, Long> {
 
-    CurrencyTransaction getTopByOrderByDate();
+    CurrencyTransaction getTopByOrderByDateDesc();
 
     @Query("SELECT transaction FROM CurrencyTransaction transaction WHERE YEAR(transaction.date) = :year AND MONTH(transaction.date) = :month AND DAY(transaction.date) = :day")
     List<CurrencyTransaction> getAllByDateYearAndDateMonthAndDateDay(@Param("year") Integer year, @Param("month") Integer month, @Param("day") Integer day);

@@ -23,9 +23,10 @@ public class NbpExchangeRate {
     @JoinColumn(name="currency_code", nullable=false)
     private Currency currency;
 
-    @Column(scale = 6, precision = 10)
+    @Column(name = "mid_rate_in_pln",scale = 6, precision = 10)
     private BigDecimal midRateInPLN;
 
+    @Column(name = "effective_date")
     private LocalDate effectiveDate;
 
     public static NbpExchangeRate applyJson(JsonNode jsonCurrency) {

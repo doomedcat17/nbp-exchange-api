@@ -22,14 +22,14 @@ public class CurrencyTransaction {
     @JoinColumn(name="sell_currency", nullable=false)
     private Currency sellCurrency;
 
-    @Column(scale = 2, precision = 20)
+    @Column(name = "sold_amount",scale = 2, precision = 20)
     private BigDecimal soldAmount;
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="buy_currency", nullable=false)
     private Currency buyCurrency;
 
-    @Column(scale = 2, precision = 20)
+    @Column(name = "bought_amount",scale = 2, precision = 20)
     private BigDecimal boughtAmount;
 
 

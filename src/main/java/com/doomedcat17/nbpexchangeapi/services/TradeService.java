@@ -3,13 +3,17 @@ package com.doomedcat17.nbpexchangeapi.services;
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
+import com.doomedcat17.nbpexchangeapi.exceptions.NotFoundException;
 import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TradeService {
@@ -18,12 +22,14 @@ public class TradeService {
 
     private final CurrencyTransactionRepository transactionRepository;
 
-    public TransactionDto buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
+    public Optional<TransactionDto> buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
         buyAmount = buyAmount.setScale(2, RoundingMode.HALF_EVEN);
         TransactionDto transaction = new TransactionDto();
-        ExchangeRateDTO exchangeRateDTO = exchangeRatesService
+        Optional<ExchangeRateDTO> foundExchangeRateDTO = exchangeRatesService
                 .getRecentExchangeRate(buyCurrencyCode, sellCurrencyCode);
-        RateDTO rate = exchangeRateDTO.getRates().get(0);
+        if (foundExchangeRateDTO.isEmpty()) return Optional.empty();
+        RateDTO rate = foundExchangeRateDTO.get()
+                .getRates().get(0);
         BigDecimal soldAmount = rate.getRate().multiply(buyAmount);
         soldAmount = soldAmount.setScale(2, RoundingMode.HALF_EVEN);
         transaction.setBuyCode(buyCurrencyCode);
@@ -32,7 +38,7 @@ public class TradeService {
         transaction.setBuyAmount(buyAmount);
         transaction.setDate(new Date(System.currentTimeMillis()));
         transactionRepository.addTransaction(transaction);
-        return transaction;
+        return Optional.of(transaction);
     }
 
     public List<TransactionDto> getTransactionsFromGivenDate(String date) {

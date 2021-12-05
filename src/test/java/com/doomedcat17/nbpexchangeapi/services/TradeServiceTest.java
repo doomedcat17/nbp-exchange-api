@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,16 +38,19 @@ class TradeServiceTest {
         BigDecimal buyAmount = new BigDecimal("40");
 
         //when
-        TransactionDto transactionDto =
+        Optional<TransactionDto> foundTransactionDto =
                 tradeService.buyCurrency(buyCurrencyCode, sellCurrencyCode, buyAmount);
 
         //then
+        assertTrue(foundTransactionDto.isPresent());
+
+        TransactionDto transactionDto = foundTransactionDto.get();
         assertAll(
                 ()-> assertEquals("PLN", transactionDto.getSellCode()),
                 ()-> assertEquals("USD", transactionDto.getBuyCode()),
                 ()-> assertEquals(new BigDecimal("163.60"), transactionDto.getSellAmount()),
                 ()-> assertEquals(new BigDecimal("40.00"), transactionDto.getBuyAmount()),
-                () -> assertEquals(1, currencyTransactionDao.count())
+                () -> assertEquals(10, currencyTransactionDao.count())
         );
     }
 

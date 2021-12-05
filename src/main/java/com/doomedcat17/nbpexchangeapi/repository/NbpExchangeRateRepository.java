@@ -2,8 +2,8 @@ package com.doomedcat17.nbpexchangeapi.repository;
 
 import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDAO;
-import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDAO;
+import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDao;
+import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDao;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
@@ -16,11 +16,11 @@ import java.util.Optional;
 @Transactional
 public class NbpExchangeRateRepository {
 
-    private final NbpExchangeRateDAO nbpExchangeRateDAO;
+    private final NbpExchangeRateDao nbpExchangeRateDAO;
 
     private final WorkWeekStartDateProvider workWeekStartDateProvider;
 
-    private final CurrencyDAO currencyDAO;
+    private final CurrencyDao currencyDAO;
 
     public synchronized void add(NbpExchangeRate nbpExchangeRate) {
         Optional<NbpExchangeRate> prestentExchangeRate =
@@ -67,7 +67,7 @@ public class NbpExchangeRateRepository {
         else return Optional.empty();
     }
 
-    public NbpExchangeRateRepository(NbpExchangeRateDAO nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDAO currencyDAO) {
+    public NbpExchangeRateRepository(NbpExchangeRateDao nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDao currencyDAO) {
         this.nbpExchangeRateDAO = nbpExchangeRateDAO;
         this.workWeekStartDateProvider = workWeekStartDateProvider;
         this.currencyDAO = currencyDAO;
