@@ -10,27 +10,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles(profiles = "test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@ActiveProfiles("test")
 class TradeServiceTest {
 
-    private final TradeService tradeService;
+    @Autowired
+    private TradeService tradeService;
 
-    private final CurrencyTransactionDao currencyTransactionDao;
-
-    private final NbpExchangeRateRepository nbpExchangeRateRepository;
-
-    @BeforeEach
-    void init() {
-        TestDataProvider.sampleExchangeRates()
-                .forEach(nbpExchangeRateRepository::add);
-    }
+    @Autowired
+    private CurrencyTransactionDao currencyTransactionDao;
 
     @Test
     void shouldReturnTransactionDto() {
@@ -38,29 +35,25 @@ class TradeServiceTest {
         //given
         String buyCurrencyCode = "USD";
         String sellCurrencyCode = "PLN";
-        BigDecimal sellAmount = new BigDecimal("40");
+        BigDecimal buyAmount = new BigDecimal("40");
 
         //when
-        TransactionDto transactionDto =
-                tradeService.buyCurrency(buyCurrencyCode, sellCurrencyCode, sellAmount);
+        Optional<TransactionDto> foundTransactionDto =
+                tradeService.buyCurrency(buyCurrencyCode, sellCurrencyCode, buyAmount);
 
         //then
+        assertTrue(foundTransactionDto.isPresent());
+
+        TransactionDto transactionDto = foundTransactionDto.get();
         assertAll(
                 ()-> assertEquals("PLN", transactionDto.getSellCode()),
                 ()-> assertEquals("USD", transactionDto.getBuyCode()),
-                ()-> assertEquals(new BigDecimal("40.00"), transactionDto.getSellAmount()),
-                ()-> assertEquals(new BigDecimal("9.78"), transactionDto.getBuyAmount()),
-                () -> assertEquals(1, currencyTransactionDao.count())
+                ()-> assertEquals(new BigDecimal("163.60"), transactionDto.getSellAmount()),
+                ()-> assertEquals(new BigDecimal("40.00"), transactionDto.getBuyAmount()),
+                () -> assertEquals(10, currencyTransactionDao.count())
         );
     }
 
 
 
-
-    @Autowired
-    public TradeServiceTest(TradeService tradeService, CurrencyTransactionDao currencyTransactionDao, NbpExchangeRateRepository nbpExchangeRateRepository) {
-        this.tradeService = tradeService;
-        this.currencyTransactionDao = currencyTransactionDao;
-        this.nbpExchangeRateRepository = nbpExchangeRateRepository;
-    }
 }

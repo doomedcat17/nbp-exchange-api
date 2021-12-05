@@ -2,6 +2,7 @@ package com.doomedcat17.nbpexchangeapi.controllers;
 
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.services.ExchangeRatesService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,42 +12,42 @@ public class RatesController {
     private final ExchangeRatesService exchangeRatesService;
 
     @GetMapping("/{currencyCode}/recent")
-    public ExchangeRateDTO recentRates(@PathVariable(name = "currencyCode") String currencyCode) {
+    public ResponseEntity<ExchangeRateDTO> recentRates(@PathVariable(name = "currencyCode") String currencyCode) {
         currencyCode = currencyCode.toUpperCase();
-        return exchangeRatesService.getRecentExchangeRatesForCode(currencyCode);
+        return ResponseEntity.of(exchangeRatesService.getRecentExchangeRatesForCode(currencyCode));
     }
 
     @GetMapping("/{currencyCode}/all")
-    public ExchangeRateDTO allRates(@PathVariable(name = "currencyCode") String currencyCode,
+    public ResponseEntity<ExchangeRateDTO> allRates(@PathVariable(name = "currencyCode") String currencyCode,
                                     @RequestParam(name = "effectiveDate", required = false, defaultValue = "") String effectiveDate) {
         currencyCode = currencyCode.toUpperCase();
-        return exchangeRatesService. getAllExchangeRatesForCodeAndDate(currencyCode, effectiveDate);
+        return ResponseEntity.of(exchangeRatesService. getAllExchangeRatesForCodeAndDate(currencyCode, effectiveDate));
     }
 
 
     @GetMapping("/{sourceCurrencyCode}/{targetCurrencyCode}/recent")
-    public ExchangeRateDTO recentRateForCode(@PathVariable(name = "sourceCurrencyCode") String sourceCurrencyCode,
+    public ResponseEntity<ExchangeRateDTO> recentRateForCode(@PathVariable(name = "sourceCurrencyCode") String sourceCurrencyCode,
                                         @PathVariable(name = "targetCurrencyCode") String targetCurrencyCode) {
         sourceCurrencyCode = sourceCurrencyCode.toUpperCase();
         targetCurrencyCode = targetCurrencyCode.toUpperCase();
-        return exchangeRatesService.getRecentExchangeRate(sourceCurrencyCode, targetCurrencyCode);
+        return ResponseEntity.of(exchangeRatesService.getRecentExchangeRate(sourceCurrencyCode, targetCurrencyCode));
     }
 
     @GetMapping("/{sourceCurrencyCode}/{targetCurrencyCode}/{date}")
-    public ExchangeRateDTO rateForCodeAndDate(@PathVariable(name = "sourceCurrencyCode") String sourceCurrencyCode,
+    public ResponseEntity<ExchangeRateDTO> rateForCodeAndDate(@PathVariable(name = "sourceCurrencyCode") String sourceCurrencyCode,
                                         @PathVariable(name = "targetCurrencyCode") String targetCurrencyCode,
                                                 @PathVariable(name = "date") String date) {
         sourceCurrencyCode = sourceCurrencyCode.toUpperCase();
         targetCurrencyCode = targetCurrencyCode.toUpperCase();
-        return exchangeRatesService.getExchangeRateForCodeAndDate(sourceCurrencyCode, targetCurrencyCode, date);
+        return ResponseEntity.of(exchangeRatesService.getExchangeRateForCodeAndDate(sourceCurrencyCode, targetCurrencyCode, date));
     }
 
     @GetMapping("/{currencyCode}/{targetCurrencyCode}/all")
-    public ExchangeRateDTO allExchangeRatesForCodes(@PathVariable(name = "currencyCode") String currencyCode,
+    public ResponseEntity<ExchangeRateDTO> allExchangeRatesForCodes(@PathVariable(name = "currencyCode") String currencyCode,
                                               @PathVariable(name = "targetCurrencyCode") String targetCurrencyCode) {
         currencyCode = currencyCode.toUpperCase();
         targetCurrencyCode = targetCurrencyCode.toUpperCase();
-        return exchangeRatesService.getExchangeRatesForCodes(currencyCode, targetCurrencyCode);
+        return ResponseEntity.of(exchangeRatesService.getExchangeRatesForCodes(currencyCode, targetCurrencyCode));
     }
 
     public RatesController(ExchangeRatesService exchangeRatesService) {

@@ -2,7 +2,6 @@ package com.doomedcat17.nbpexchangeapi.data;
 
 import lombok.Getter;
 import lombok.Setter;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,19 +18,20 @@ public class CurrencyTransaction {
 
     private Date date;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="sell_currency", nullable=false)
     private Currency sellCurrency;
 
-    @Column(scale = 2, precision = 20)
+    @Column(name = "sold_amount",scale = 2, precision = 20)
     private BigDecimal soldAmount;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="buy_currency", nullable=false)
     private Currency buyCurrency;
 
-    @Column(scale = 2, precision = 20)
+    @Column(name = "bought_amount",scale = 2, precision = 20)
     private BigDecimal boughtAmount;
+
 
 
     @Override

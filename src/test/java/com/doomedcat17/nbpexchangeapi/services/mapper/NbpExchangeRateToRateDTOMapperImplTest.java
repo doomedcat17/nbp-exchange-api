@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NbpExchangeRateToRateDTOMapperImplTest {
 
-
-    private NbpExchangeRateToRateDTOMapperImpl nbpExchangeRateToRateDTOMapper = new NbpExchangeRateToRateDTOMapperImpl();
+    private final NbpExchangeRateToRateDTOMapperImpl nbpExchangeRateToRateDTOMapper =
+            new NbpExchangeRateToRateDTOMapperImpl();
 
     @Test
     void shouldMapJPYToUSDRateAndReverse() {

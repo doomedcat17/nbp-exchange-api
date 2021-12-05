@@ -9,13 +9,15 @@ import java.time.LocalDate;
 public class WorkWeekStartDateProvider {
 
     public LocalDate get(LocalDate now) {
-        LocalDate startDate = now;
         int remainingDays = 7;
+        LocalDate startDate;
+        LocalDate temp = now;
         do {
-            if (remainingDays != 7) startDate = startDate.minusDays(1);
+            startDate = temp;
             if (isNotHoliday(startDate)) {
                 remainingDays--;
             }
+            temp = temp.minusDays(1);
         } while (remainingDays != 0);
         return startDate;
     }
