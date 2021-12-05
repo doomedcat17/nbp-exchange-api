@@ -2,13 +2,13 @@ package com.doomedcat17.nbpexchangeapi.repository;
 
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyTransactionDao;
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -78,13 +78,14 @@ class CurrencyTransactionRepositoryTest {
         LocalDate endDate = LocalDate.parse("2021-12-02");
 
         //when
-        List<TransactionDto> foundTransactions = currencyTransactionRepository.getAllBetweenDates(startDate ,endDate);
+        List<TransactionDto> foundTransactions = currencyTransactionRepository.getAllFromGivenDates(startDate ,endDate);
 
         //then
+        LocalDate dateAfterEndDate = LocalDate.parse("2021-12-03");
         assertTrue(foundTransactions
                 .stream().allMatch(transactionDto ->
                         !transactionDto.getDate().before(Date.valueOf(startDate))
-                                && !transactionDto.getDate().after(Date.valueOf(endDate))));
-        assertEquals(2, foundTransactions.size());
+                                && (!transactionDto.getDate().equals(Date.valueOf(dateAfterEndDate)) || !transactionDto.getDate().after(Date.valueOf(dateAfterEndDate)))));
+        assertEquals(5, foundTransactions.size());
     }
 }
