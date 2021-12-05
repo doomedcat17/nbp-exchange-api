@@ -306,9 +306,9 @@ Zwraca aktualny kurs wymiany dolara na złotówki:
 **Metoda:** `GET`  
 **Opis:** zwraca kurs dla podanych walut z podanej daty  
 **Parametry:**
-- `sourceCurrencyCode`: kod waluty, którą wymieniamy
-- `targetCurrencyCode`: kod waluty, na którą chcemy wymienić
-- `effectiveDate`: data kursu
+- `{sourceCurrencyCode}`: kod waluty, którą wymieniamy
+- `{targetCurrencyCode}`: kod waluty, na którą chcemy wymienić
+- `{effectiveDate}`: data kursu
 
 <details><summary><b>Przykład</b></summary>
 <p>
@@ -339,8 +339,8 @@ Zwraca aktualny kurs wymiany dolara na złotówki z dnia 2021-11-29:
 **Metoda:** `GET`  
 **Opis:** zwraca wszystkie kursy dla podanych walut  
 **Parametry:**
-- `sourceCurrencyCode`: kod waluty, którą wymieniamy
-- `targetCurrencyCode`: kod waluty, na którą chcemy wymienić
+- `{sourceCurrencyCode}`: kod waluty, którą wymieniamy
+- `{targetCurrencyCode}`: kod waluty, na którą chcemy wymienić
 
 <details><summary><b>Przykład</b></summary>
 <p>
@@ -398,9 +398,9 @@ Zwraca wszystkie kursy wymiany dolara na złotówki:
 **Metoda:** `GET`  
 **Opis:** zwraca ilość zakupionej waluty dla podanych walut  
 **Parametry:**
-- `buyCurrencyCode`: kod waluty, na którą kupujemy
-- `sellCurrencyCode`: kod waluty, na którą sprzedajemy
-- `buyAmount`: ilość, jaką chcemy kupić
+- `{buyCurrencyCode}`: kod waluty, na którą kupujemy
+- `{sellCurrencyCode}`: kod waluty, na którą sprzedajemy
+- `{buyAmount}`: ilość, jaką chcemy kupić
 
 <details><summary><b>Przykład</b></summary>
 <p>
@@ -514,7 +514,7 @@ Zwraca wszystkie transakcje z dnia 2021-12-03:
 **Opis:** zwraca wszystkie transakcje z danego zakresu dat
 **Parametry:**
 - `{startDate}`: początkowa data zakresu
-- `{startDate}`: końcowa data zakresu
+- `{endDate}`: końcowa data zakresu
 
 <details><summary><b>Przykład</b></summary>
 <p>
@@ -554,7 +554,7 @@ Zwraca wszystkie transakcje z zakresu od 2021-12-01 do 2021-12-03:
 </p>
 </details>
 
-### Historia wymiany walut
+### Komunikaty błędów
 
 W przypadku braku danych, zwracane jest pusta odpowiedź o kodzie `404 Not Found`.  
 W przypadku nieprawidłowego formatu daty, zwracany jest stosowny komunikat o kodzie `400 Bad Request`.
