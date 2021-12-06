@@ -478,7 +478,7 @@ Zwraca ilość zakupionych złotówek za dolary
 
 **Endpoint:** `/api/trade/history/{date}`  
 **Metoda:** `GET`  
-**Opis:** zwraca wszystkie transakcje z danego dnia
+**Opis:** zwraca wszystkie transakcje z danego dnia  
 **Parametry:**
 - `{date}`: data, z której chcemy uzyskać historię transakcji
 
@@ -522,7 +522,7 @@ Zwraca wszystkie transakcje z dnia 2021-12-03:
 
 **Endpoint:** `/api/trade/history/{startDate}/{endDate}`  
 **Metoda:** `GET`  
-**Opis:** zwraca wszystkie transakcje z danego zakresu dat
+**Opis:** zwraca wszystkie transakcje z danego zakresu dat  
 **Parametry:**
 - `{startDate}`: początkowa data zakresu
 - `{endDate}`: końcowa data zakresu
