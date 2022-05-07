@@ -4,13 +4,11 @@ import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.NbpRatesProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-@Profile({"!test"})
 @Component
 @Slf4j
 public class ScheduledTasks {
