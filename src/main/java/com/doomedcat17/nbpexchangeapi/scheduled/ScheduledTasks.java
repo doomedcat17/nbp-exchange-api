@@ -17,13 +17,18 @@ public class ScheduledTasks {
 
     private final NbpRatesProvider nbpRatesProvider;
 
+    public ScheduledTasks(NbpExchangeRateRepository rateRepository, NbpRatesProvider nbpRatesProvider) {
+        this.rateRepository = rateRepository;
+        this.nbpRatesProvider = nbpRatesProvider;
+    }
+
     //12:31 pm everyday
     @Scheduled(cron = "* 31 12 * * *")
     public void update() {
         log.info("Updating...");
         Set<NbpExchangeRate> nbpExchangeRates =
                 nbpRatesProvider.getRecent();
-        if (nbpExchangeRates.isEmpty()){
+        if (nbpExchangeRates.isEmpty()) {
             try {
                 log.error("Update failed. Api returned empty collection");
                 log.info("Sleeping...");
@@ -40,10 +45,5 @@ public class ScheduledTasks {
         log.info("Removing rates older than week...");
         rateRepository.removeAllOlderThanWeek();
         log.info("Removal success!");
-    }
-
-    public ScheduledTasks(NbpExchangeRateRepository rateRepository, NbpRatesProvider nbpRatesProvider) {
-        this.rateRepository = rateRepository;
-        this.nbpRatesProvider = nbpRatesProvider;
     }
 }

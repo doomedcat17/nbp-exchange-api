@@ -19,6 +19,11 @@ public class ExchangeRatesService {
 
     protected final NbpExchangeRateToRateDTOMapper nbpExchangeRateToRateDTOMapper;
 
+    public ExchangeRatesService(NbpExchangeRateRepository nbpExchangeRateRepository, NbpExchangeRateToRateDTOMapper nbpExchangeRateToRateDTOMapper) {
+        this.nbpExchangeRateRepository = nbpExchangeRateRepository;
+        this.nbpExchangeRateToRateDTOMapper = nbpExchangeRateToRateDTOMapper;
+    }
+
     public Optional<ExchangeRateDTO> getRecentExchangeRatesForCode(String code) {
         List<RateDTO> rates = getRecentRatesForCurrency(code);
         ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
@@ -151,8 +156,4 @@ public class ExchangeRatesService {
 
     }
 
-    public ExchangeRatesService(NbpExchangeRateRepository nbpExchangeRateRepository, NbpExchangeRateToRateDTOMapper nbpExchangeRateToRateDTOMapper) {
-        this.nbpExchangeRateRepository = nbpExchangeRateRepository;
-        this.nbpExchangeRateToRateDTOMapper = nbpExchangeRateToRateDTOMapper;
-    }
 }

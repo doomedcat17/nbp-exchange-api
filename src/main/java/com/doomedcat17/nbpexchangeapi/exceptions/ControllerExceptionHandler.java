@@ -1,6 +1,5 @@
 package com.doomedcat17.nbpexchangeapi.exceptions;
 
-import com.doomedcat17.nbpexchangeapi.exceptions.CurrencyNotFoundException;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,57 +14,52 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(CurrencyNotFoundException.class)
     public ResponseEntity<ErrorResponse> invalidCurrencyCode(Exception exception) {
-        ErrorResponse error = new ErrorResponse();
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-        error.setTimestamp(LocalDateTime.now());
-        error.setMessage(exception.getMessage());
-        error.setStatus(httpStatus.value());
+        ErrorResponse error = new ErrorResponse(httpStatus.value(), exception.getMessage());
         return new ResponseEntity<>(error, httpStatus);
     }
 
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<ErrorResponse> invalidDate() {
-        ErrorResponse error = new ErrorResponse();
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        error.setTimestamp(LocalDateTime.now());
-        error.setMessage("Invalid date format");
-        error.setStatus(httpStatus.value());
+        ErrorResponse error = new ErrorResponse(httpStatus.value(), "Invalid date format");
         return new ResponseEntity<>(error, httpStatus);
     }
 
     @ExceptionHandler(MissingRequestParameterException.class)
     public ResponseEntity<ErrorResponse> missingParameter(Exception e) {
-        ErrorResponse error = new ErrorResponse();
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        error.setTimestamp(LocalDateTime.now());
-        error.setMessage(e.getMessage());
-        error.setStatus(httpStatus.value());
+        ErrorResponse error = new ErrorResponse(httpStatus.value(), e.getMessage());
         return new ResponseEntity<>(error, httpStatus);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> notFound() {
-        ErrorResponse error = new ErrorResponse();
         HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-        error.setTimestamp(LocalDateTime.now());
-        error.setMessage("Not found");
-        error.setStatus(httpStatus.value());
+        ErrorResponse error = new ErrorResponse(httpStatus.value(), "Not found");
+        error.setDate(LocalDateTime.now());
         return new ResponseEntity<>(error, httpStatus);
     }
 
 
     static class ErrorResponse {
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
-        private LocalDateTime timestamp;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        private LocalDateTime date;
         private int status;
         private String message;
 
-        public LocalDateTime getTimestamp() {
-            return timestamp;
+        public ErrorResponse(int status, String message) {
+            this.status = status;
+            this.message = message;
+            this.date = LocalDateTime.now();
         }
 
-        public void setTimestamp(LocalDateTime timestamp) {
-            this.timestamp = timestamp;
+        public LocalDateTime getDate() {
+            return date;
+        }
+
+        public void setDate(LocalDateTime date) {
+            this.date = date;
         }
 
         public int getStatus() {

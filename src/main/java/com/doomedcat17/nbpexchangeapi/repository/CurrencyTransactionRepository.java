@@ -18,6 +18,11 @@ public class CurrencyTransactionRepository {
 
     private final CurrencyDao currencyDAO;
 
+    public CurrencyTransactionRepository(CurrencyTransactionDao currencyTransactionDao, CurrencyDao currencyDAO) {
+        this.currencyTransactionDao = currencyTransactionDao;
+        this.currencyDAO = currencyDAO;
+    }
+
     public void addTransaction(TransactionDto transactionDto) {
         CurrencyTransaction currencyTransaction = new CurrencyTransaction();
         Currency sellCurrency = currencyDAO.findById(transactionDto.getSellCode()).get();
@@ -51,9 +56,4 @@ public class CurrencyTransactionRepository {
                 .collect(Collectors.toList());
     }
 
-
-    public CurrencyTransactionRepository(CurrencyTransactionDao currencyTransactionDao, CurrencyDao currencyDAO) {
-        this.currencyTransactionDao = currencyTransactionDao;
-        this.currencyDAO = currencyDAO;
-    }
 }

@@ -17,10 +17,15 @@ public class TradeController {
 
     private final TradeService tradeService;
 
+
+    public TradeController(TradeService tradeService) {
+        this.tradeService = tradeService;
+    }
+
     @GetMapping("/{buyCurrencyCode}/{sellCurrencyCode}/{buyAmount}")
     public ResponseEntity<TransactionDto> trade(@PathVariable(name = "sellCurrencyCode") String sellCurrencyCode,
-                                            @PathVariable(name = "buyCurrencyCode") String buyCurrencyCode,
-                                @PathVariable(name = "buyAmount") String buyAmount) {
+                                                @PathVariable(name = "buyCurrencyCode") String buyCurrencyCode,
+                                                @PathVariable(name = "buyAmount") String buyAmount) {
         return ResponseEntity.of(
                 tradeService.buyCurrency(buyCurrencyCode.toUpperCase(), sellCurrencyCode.toUpperCase(), new BigDecimal(buyAmount))
         );
@@ -48,9 +53,5 @@ public class TradeController {
         return ResponseEntity.of(tradeService.buyCurrency(sellRequestDto.getBuyCode().toUpperCase(),
                 sellRequestDto.getSellCode().toUpperCase(), new BigDecimal(sellRequestDto.getBuyAmount()))
         );
-    }
-
-    public TradeController(TradeService tradeService) {
-        this.tradeService = tradeService;
     }
 }

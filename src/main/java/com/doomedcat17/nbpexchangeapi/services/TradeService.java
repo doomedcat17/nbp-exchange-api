@@ -20,6 +20,11 @@ public class TradeService {
 
     private final CurrencyTransactionRepository transactionRepository;
 
+    public TradeService(ExchangeRatesService exchangeRatesService, CurrencyTransactionRepository transactionRepository) {
+        this.exchangeRatesService = exchangeRatesService;
+        this.transactionRepository = transactionRepository;
+    }
+
     public Optional<TransactionDto> buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
         buyAmount = buyAmount.setScale(2, RoundingMode.HALF_EVEN);
         TransactionDto transaction = new TransactionDto();
@@ -48,10 +53,5 @@ public class TradeService {
         LocalDate transactionStartDate = LocalDate.parse(startDate);
         LocalDate transactionEndDate= LocalDate.parse(endDate);
         return transactionRepository.getAllFromGivenDates(transactionStartDate, transactionEndDate);
-    }
-
-    public TradeService(ExchangeRatesService exchangeRatesService, CurrencyTransactionRepository transactionRepository) {
-        this.exchangeRatesService = exchangeRatesService;
-        this.transactionRepository = transactionRepository;
     }
 }

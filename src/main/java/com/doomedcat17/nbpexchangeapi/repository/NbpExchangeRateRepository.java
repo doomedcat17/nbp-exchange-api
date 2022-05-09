@@ -7,6 +7,7 @@ import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDao;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
+
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,12 +23,19 @@ public class NbpExchangeRateRepository {
 
     private final CurrencyDao currencyDAO;
 
+    public NbpExchangeRateRepository(NbpExchangeRateDao nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDao currencyDAO) {
+        this.nbpExchangeRateDAO = nbpExchangeRateDAO;
+        this.workWeekStartDateProvider = workWeekStartDateProvider;
+        this.currencyDAO = currencyDAO;
+    }
+
+
     public synchronized void add(NbpExchangeRate nbpExchangeRate) {
-        Optional<NbpExchangeRate> prestentExchangeRate =
+        Optional<NbpExchangeRate> presentExchangeRate =
                 getByCurrencyCodeAndEffectiveDate(
                         nbpExchangeRate.getCurrency().getCode(),
                         nbpExchangeRate.getEffectiveDate());
-        if (prestentExchangeRate.isEmpty()) {
+        if (presentExchangeRate.isEmpty()) {
             Optional<Currency> currency = currencyDAO.findById(nbpExchangeRate.getCurrency().getCode());
             currency.ifPresent(nbpExchangeRate::setCurrency);
             nbpExchangeRateDAO.save(nbpExchangeRate);
@@ -65,11 +73,5 @@ public class NbpExchangeRateRepository {
         List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateDAO.getMostRecentByCode(currencyCode, PageRequest.of(0, 1));
         if (!foundExchangeRates.isEmpty()) return Optional.of(foundExchangeRates.get(0));
         else return Optional.empty();
-    }
-
-    public NbpExchangeRateRepository(NbpExchangeRateDao nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDao currencyDAO) {
-        this.nbpExchangeRateDAO = nbpExchangeRateDAO;
-        this.workWeekStartDateProvider = workWeekStartDateProvider;
-        this.currencyDAO = currencyDAO;
     }
 }

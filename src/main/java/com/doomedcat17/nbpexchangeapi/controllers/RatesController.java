@@ -11,6 +11,10 @@ public class RatesController {
 
     private final ExchangeRatesService exchangeRatesService;
 
+    public RatesController(ExchangeRatesService exchangeRatesService) {
+        this.exchangeRatesService = exchangeRatesService;
+    }
+
     @GetMapping("/{currencyCode}/recent")
     public ResponseEntity<ExchangeRateDTO> recentRates(@PathVariable(name = "currencyCode") String currencyCode) {
         currencyCode = currencyCode.toUpperCase();
@@ -19,7 +23,7 @@ public class RatesController {
 
     @GetMapping("/{currencyCode}/all")
     public ResponseEntity<ExchangeRateDTO> allRates(@PathVariable(name = "currencyCode") String currencyCode,
-                                    @RequestParam(name = "effectiveDate", required = false, defaultValue = "") String effectiveDate) {
+                                                    @RequestParam(name = "effectiveDate", required = false, defaultValue = "") String effectiveDate) {
         currencyCode = currencyCode.toUpperCase();
         return ResponseEntity.of(exchangeRatesService. getAllExchangeRatesForCodeAndDate(currencyCode, effectiveDate));
     }
@@ -48,9 +52,5 @@ public class RatesController {
         currencyCode = currencyCode.toUpperCase();
         targetCurrencyCode = targetCurrencyCode.toUpperCase();
         return ResponseEntity.of(exchangeRatesService.getExchangeRatesForCodes(currencyCode, targetCurrencyCode));
-    }
-
-    public RatesController(ExchangeRatesService exchangeRatesService) {
-        this.exchangeRatesService = exchangeRatesService;
     }
 }
