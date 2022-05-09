@@ -2,9 +2,10 @@ package com.doomedcat17.nbpexchangeapi.data;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -15,8 +16,7 @@ public class CurrencyTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-    private Date date;
+    private LocalDateTime date;
 
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name="sell_currency", nullable=false)

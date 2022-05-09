@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface CurrencyTransactionDao extends JpaRepository<CurrencyTransaction, Long> {
@@ -16,5 +16,5 @@ public interface CurrencyTransactionDao extends JpaRepository<CurrencyTransactio
     List<CurrencyTransaction> getAllByDateYearAndDateMonthAndDateDay(@Param("year") Integer year, @Param("month") Integer month, @Param("day") Integer day);
 
     @Query("SELECT transaction FROM CurrencyTransaction transaction WHERE transaction.date BETWEEN :startDate AND :endDate")
-    List<CurrencyTransaction> getAllBetweenDates(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<CurrencyTransaction> getAllBetweenDates(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

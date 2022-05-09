@@ -5,10 +5,11 @@ import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class TradeService {
         transaction.setSellCode(sellCurrencyCode);
         transaction.setSellAmount(soldAmount);
         transaction.setBuyAmount(buyAmount);
-        transaction.setDate(new Date(System.currentTimeMillis()));
+        transaction.setDate(LocalDateTime.now());
         transactionRepository.addTransaction(transaction);
         return Optional.of(transaction);
     }

@@ -6,9 +6,8 @@ import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDao;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyTransactionDao;
 import org.springframework.stereotype.Repository;
-import java.sql.Date;
+
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,14 +44,8 @@ public class CurrencyTransactionRepository {
     }
 
     public List<TransactionDto> getAllFromGivenDates(LocalDate startDate, LocalDate endDate) {
-        java.util.Date endDateEnd = Date.from(endDate.atStartOfDay()
-                        .plusHours(23)
-                        .plusMinutes(59)
-                        .plusSeconds(59)
-                        .atZone(ZoneId.systemDefault())
-                .toInstant());
         List<CurrencyTransaction> currencyTransactions =
-                currencyTransactionDao.getAllBetweenDates(Date.valueOf(startDate), endDateEnd);
+                currencyTransactionDao.getAllBetweenDates(startDate, endDate);
         return currencyTransactions.stream()
                 .map(TransactionDto::applyCurrencyTransaction)
                 .collect(Collectors.toList());

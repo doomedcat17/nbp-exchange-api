@@ -5,20 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class TransactionDto {
 
-    private Date date;
-
+    private LocalDateTime date;
     private String buyCode;
-
     private BigDecimal buyAmount;
-
     private String sellCode;
-
     private BigDecimal sellAmount;
 
     public static TransactionDto applyCurrencyTransaction(CurrencyTransaction currencyTransaction) {
