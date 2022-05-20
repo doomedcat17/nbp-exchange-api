@@ -10,6 +10,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ class CurrencyTransactionRepositoryTest {
 
         //given
         TransactionDto transactionDto = new TransactionDto();
-        transactionDto.setDate(new Date(System.currentTimeMillis()));
+        transactionDto.setDate(LocalDateTime.now());
         transactionDto.setSellAmount(new BigDecimal("12"));
         transactionDto.setBuyAmount(new BigDecimal("20"));
         transactionDto.setSellCode("PLN");
@@ -78,11 +79,11 @@ class CurrencyTransactionRepositoryTest {
         List<TransactionDto> foundTransactions = currencyTransactionRepository.getAllFromGivenDates(startDate ,endDate);
 
         //then
-        LocalDate dateAfterEndDate = LocalDate.parse("2021-12-03");
+        LocalDateTime dateAfterEndDate = LocalDateTime.parse("2021-12-03");
         assertTrue(foundTransactions
                 .stream().allMatch(transactionDto ->
-                        !transactionDto.getDate().before(Date.valueOf(startDate))
-                                && (!transactionDto.getDate().equals(Date.valueOf(dateAfterEndDate)) || !transactionDto.getDate().after(Date.valueOf(dateAfterEndDate)))));
+                        !transactionDto.getDate().isBefore(LocalDateTime.from(startDate))
+                                && (!transactionDto.getDate().equals(endDate) || !transactionDto.getDate().isAfter(dateAfterEndDate))));
         assertEquals(5, foundTransactions.size());
     }
 }
