@@ -17,16 +17,6 @@ public class TransactionDto {
     private String sellCode;
     private BigDecimal sellAmount;
 
-    public static TransactionDto applyCurrencyTransaction(CurrencyTransaction currencyTransaction) {
-        TransactionDto transactionDto = new TransactionDto();
-        transactionDto.setDate(currencyTransaction.getDate());
-        transactionDto.setBuyCode(currencyTransaction.getBuyCurrency().getCode());
-        transactionDto.setSellCode(currencyTransaction.getSellCurrency().getCode());
-        transactionDto.setBuyAmount(currencyTransaction.getBoughtAmount());
-        transactionDto.setSellAmount(currencyTransaction.getSoldAmount());
-        return transactionDto;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

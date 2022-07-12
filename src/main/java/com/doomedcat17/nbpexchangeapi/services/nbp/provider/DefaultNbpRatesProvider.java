@@ -2,10 +2,12 @@ package com.doomedcat17.nbpexchangeapi.services.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.table.NbpTableProvider;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -15,11 +17,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@AllArgsConstructor
 public class DefaultNbpRatesProvider implements NbpRatesProvider {
 
     private final NbpTableProvider nbpTableProvider;
 
     private final WorkWeekStartDateProvider workWeekStartDateProvider;
+
+    private final NbpExchangeRateMapper mapper;
 
     private final Set<String> tableNames = Set.of("a", "b");
 
@@ -64,9 +69,8 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
         LocalDate tableEffectiveDate = LocalDate.parse(jsonTableObject.get("effectiveDate").asText());
         ArrayNode tableCurrencies = (ArrayNode) jsonTableObject.get("rates");
         tableCurrencies.forEach(jsonCurrency -> {
-            NbpExchangeRate nbpExchangeRAte = NbpExchangeRate.applyJson(jsonCurrency);
-            nbpExchangeRAte.setEffectiveDate(tableEffectiveDate);
-            exchangeRates.add(nbpExchangeRAte);
+            NbpExchangeRate nbpExchangeRate = mapper.fromJson(jsonCurrency, tableEffectiveDate);
+            exchangeRates.add(nbpExchangeRate);
         });
         exchangeRates.add(
                 new NbpExchangeRate(
@@ -78,8 +82,4 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
         return exchangeRates;
     }
 
-    public DefaultNbpRatesProvider(NbpTableProvider nbpTableProvider, WorkWeekStartDateProvider workWeekStartDateProvider) {
-        this.nbpTableProvider = nbpTableProvider;
-        this.workWeekStartDateProvider = workWeekStartDateProvider;
-    }
 }

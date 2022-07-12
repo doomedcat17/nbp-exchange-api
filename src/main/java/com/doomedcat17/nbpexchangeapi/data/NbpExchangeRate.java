@@ -19,7 +19,7 @@ public class NbpExchangeRate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne()
     @JoinColumn(name="currency_code", nullable=false)
     private Currency currency;
 
@@ -29,15 +29,6 @@ public class NbpExchangeRate {
     @Column(name = "effective_date")
     private LocalDate effectiveDate;
 
-    public static NbpExchangeRate applyJson(JsonNode jsonCurrency) {
-        NbpExchangeRate nbpExchangeRate = new NbpExchangeRate();
-        Currency currency = new Currency();
-        currency.setName(jsonCurrency.get("currency").asText());
-        currency.setCode(jsonCurrency.get("code").asText());
-        nbpExchangeRate.setCurrency(currency);
-        nbpExchangeRate.setMidRateInPLN(new BigDecimal(jsonCurrency.get("mid").asText()));
-        return nbpExchangeRate;
-    }
 
     public NbpExchangeRate(Currency currency, BigDecimal midRateInPLN, LocalDate effectiveDate) {
         this.currency = currency;

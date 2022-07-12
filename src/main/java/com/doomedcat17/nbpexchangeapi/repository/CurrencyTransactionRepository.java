@@ -3,8 +3,10 @@ package com.doomedcat17.nbpexchangeapi.repository;
 import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.CurrencyTransaction;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
+import com.doomedcat17.nbpexchangeapi.mapper.CurrencyTransactionMapper;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDao;
 import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyTransactionDao;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -12,16 +14,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
+@AllArgsConstructor
 public class CurrencyTransactionRepository {
 
     private final CurrencyTransactionDao currencyTransactionDao;
-
     private final CurrencyDao currencyDAO;
 
-    public CurrencyTransactionRepository(CurrencyTransactionDao currencyTransactionDao, CurrencyDao currencyDAO) {
-        this.currencyTransactionDao = currencyTransactionDao;
-        this.currencyDAO = currencyDAO;
-    }
+    private final CurrencyTransactionMapper mapper;
 
     public void addTransaction(TransactionDto transactionDto) {
         CurrencyTransaction currencyTransaction = new CurrencyTransaction();
@@ -37,23 +36,23 @@ public class CurrencyTransactionRepository {
 
     public TransactionDto getLatestTransaction(){
         CurrencyTransaction currencyTransaction = currencyTransactionDao.getTopByOrderByDateDesc();
-        return TransactionDto.applyCurrencyTransaction(currencyTransaction);
+        return mapper.toDto(currencyTransaction);
     }
 
     public List<TransactionDto> getAllByDate(LocalDate date) {
         List<CurrencyTransaction> currencyTransactions = currencyTransactionDao
                 .getAllByDateYearAndDateMonthAndDateDay(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
         return currencyTransactions.stream()
-                .map(TransactionDto::applyCurrencyTransaction)
-                .collect(Collectors.toList());
+                .map(mapper::toDto)
+                .toList();
     }
 
     public List<TransactionDto> getAllFromGivenDates(LocalDate startDate, LocalDate endDate) {
         List<CurrencyTransaction> currencyTransactions =
                 currencyTransactionDao.getAllBetweenDates(startDate, endDate);
         return currencyTransactions.stream()
-                .map(TransactionDto::applyCurrencyTransaction)
-                .collect(Collectors.toList());
+                .map(mapper::toDto)
+                .toList();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.controllers;
 
-import com.doomedcat17.nbpexchangeapi.data.SellRequestDto;
+import com.doomedcat17.nbpexchangeapi.data.dto.SellRequestDto;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.doomedcat17.nbpexchangeapi.exceptions.MissingRequestParameterException;
 import com.doomedcat17.nbpexchangeapi.services.TradeService;

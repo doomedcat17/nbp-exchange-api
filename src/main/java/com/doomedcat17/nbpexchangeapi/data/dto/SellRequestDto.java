@@ -1,4 +1,4 @@
-package com.doomedcat17.nbpexchangeapi.data;
+package com.doomedcat17.nbpexchangeapi.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

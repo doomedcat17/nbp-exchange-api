@@ -11,5 +11,5 @@ public class ExchangeRateDTO {
 
     private String code;
 
-    List<RateDTO> rates;
+    private List<RateDTO> rates;
 }
