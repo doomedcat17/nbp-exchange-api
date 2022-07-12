@@ -2,6 +2,7 @@ package com.doomedcat17.nbpexchangeapi.repository.dao;
 
 import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-class NbpExchangeRateDaoTest {
+class NbpExchangeRateRepositoryTest {
 
     @Autowired
-    private NbpExchangeRateDao nbpExchangeRateDAO;
+    private NbpExchangeRateRepository nbpExchangeRateRepository;
 
     @Test
     void shouldReturnMostRecent() {
@@ -39,9 +40,9 @@ class NbpExchangeRateDaoTest {
                         LocalDate.parse("2021-11-25"));
 
         //when
-        NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO
+        NbpExchangeRate foundExchangeRate = nbpExchangeRateRepository
                 .getMostRecentByCode("USD", PageRequest.of(0, 1)).get(0);
-        NbpExchangeRate foundExchangeRate2 = nbpExchangeRateDAO
+        NbpExchangeRate foundExchangeRate2 = nbpExchangeRateRepository
                 .getMostRecentByCode("AFN", PageRequest.of(0, 1)).get(0);
 
         //then
@@ -53,7 +54,7 @@ class NbpExchangeRateDaoTest {
     @Test
     void shouldReturnAllWithMatchingCode() {
         //when
-        List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateDAO.getAllByCurrencyCode("USD");
+        List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateRepository.getAllByCurrencyCode("USD");
 
         //then
         assertEquals(10, foundExchangeRates.size());
@@ -65,7 +66,7 @@ class NbpExchangeRateDaoTest {
         //given
         LocalDate date = LocalDate.parse("2021-11-25");
         //when
-        NbpExchangeRate foundExchangeRate = nbpExchangeRateDAO.getByCurrencyCodeAndEffectiveDate("USD", date);
+        NbpExchangeRate foundExchangeRate = nbpExchangeRateRepository.getByCurrencyCodeAndEffectiveDate("USD", date);
 
         //then
         assertEquals("USD", foundExchangeRate.getCurrency().getCode());
@@ -80,7 +81,7 @@ class NbpExchangeRateDaoTest {
         LocalDate afnMostRecentDate = LocalDate.parse("2021-11-25");
 
         //when
-        List<NbpExchangeRate> nbpExchangeRates = nbpExchangeRateDAO.getRecent();
+        List<NbpExchangeRate> nbpExchangeRates = nbpExchangeRateRepository.getRecent();
 
         //then
         assertAll(
@@ -100,13 +101,13 @@ class NbpExchangeRateDaoTest {
     void shouldRemoveOlderThanGivenDate() {
         //given
         LocalDate date = LocalDate.parse("2021-11-22");
-        long sizeBefore = nbpExchangeRateDAO.count();
+        long sizeBefore = nbpExchangeRateRepository.count();
 
         //when
-        nbpExchangeRateDAO.deleteAllByEffectiveDateBefore(date);
+        nbpExchangeRateRepository.deleteAllByEffectiveDateBefore(date);
 
         //then
-        assertEquals(sizeBefore - 7, nbpExchangeRateDAO.count());
+        assertEquals(sizeBefore - 7, nbpExchangeRateRepository.count());
     }
 
     @Test
@@ -115,7 +116,7 @@ class NbpExchangeRateDaoTest {
         LocalDate date = LocalDate.parse("2021-11-25");
 
         //when
-        List<NbpExchangeRate> exchangeRates = nbpExchangeRateDAO.getAllByEffectiveDate(date);
+        List<NbpExchangeRate> exchangeRates = nbpExchangeRateRepository.getAllByEffectiveDate(date);
 
         //then
         assertEquals(5, exchangeRates.size());

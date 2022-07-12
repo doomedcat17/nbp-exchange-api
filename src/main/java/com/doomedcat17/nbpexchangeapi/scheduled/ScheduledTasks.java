@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.scheduled;
 
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
+import com.doomedcat17.nbpexchangeapi.services.ExchangeRateService;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.NbpRatesProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,11 +13,11 @@ import java.util.Set;
 @Slf4j
 public class ScheduledTasks {
 
-    private final NbpExchangeRateRepository rateRepository;
+    private final ExchangeRateService rateRepository;
 
     private final NbpRatesProvider nbpRatesProvider;
 
-    public ScheduledTasks(NbpExchangeRateRepository rateRepository, NbpRatesProvider nbpRatesProvider) {
+    public ScheduledTasks(ExchangeRateService rateRepository, NbpRatesProvider nbpRatesProvider) {
         this.rateRepository = rateRepository;
         this.nbpRatesProvider = nbpRatesProvider;
     }

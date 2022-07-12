@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.repository;
 
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyTransactionDao;
+import com.doomedcat17.nbpexchangeapi.services.CurrencyTransactionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-class CurrencyTransactionRepositoryTest {
-
-    @Autowired
-    private CurrencyTransactionDao currencyTransactionDao;
+class CurrencyTransactionServiceTest {
 
     @Autowired
     private CurrencyTransactionRepository currencyTransactionRepository;
+
+    @Autowired
+    private CurrencyTransactionService currencyTransactionService;
 
     @Test
     void shouldAddTransaction() {
@@ -38,17 +38,17 @@ class CurrencyTransactionRepositoryTest {
         transactionDto.setBuyCode("USD");
 
         //when
-        currencyTransactionRepository.addTransaction(transactionDto);
+        currencyTransactionService.addTransaction(transactionDto);
 
         //then
-        assertEquals(10, currencyTransactionDao.count());
+        assertEquals(10, currencyTransactionRepository.count());
     }
 
     @Test
     void shouldReturnLatestTransaction() {
 
         //when
-        TransactionDto foundTransaction = currencyTransactionRepository.getLatestTransaction();
+        TransactionDto foundTransaction = currencyTransactionService.getLatestTransaction();
 
         //then
         assertEquals("USD", foundTransaction.getBuyCode());
@@ -62,7 +62,7 @@ class CurrencyTransactionRepositoryTest {
         LocalDate expectedDate = LocalDate.parse("2021-11-29");
 
         //when
-        List<TransactionDto> foundTransactions = currencyTransactionRepository.getAllByDate(expectedDate);
+        List<TransactionDto> foundTransactions = currencyTransactionService.getAllByDate(expectedDate);
 
         //then
         assertEquals(2, foundTransactions.size());
@@ -76,7 +76,7 @@ class CurrencyTransactionRepositoryTest {
         LocalDate endDate = LocalDate.parse("2021-12-02");
 
         //when
-        List<TransactionDto> foundTransactions = currencyTransactionRepository.getAllFromGivenDates(startDate ,endDate);
+        List<TransactionDto> foundTransactions = currencyTransactionService.getAllFromGivenDates(startDate ,endDate);
 
         //then
         LocalDateTime dateAfterEndDate = LocalDateTime.parse("2021-12-03");

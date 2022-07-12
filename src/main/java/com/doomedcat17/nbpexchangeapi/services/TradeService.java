@@ -3,7 +3,6 @@ package com.doomedcat17.nbpexchangeapi.services;
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -11,27 +10,25 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TradeService {
 
-    private final ExchangeRatesService exchangeRatesService;
+    private final ExchangeRateDtoService exchangeRateDtoService;
 
-    private final CurrencyTransactionRepository transactionRepository;
+    private final CurrencyTransactionService transactionRepository;
 
-    public TradeService(ExchangeRatesService exchangeRatesService, CurrencyTransactionRepository transactionRepository) {
-        this.exchangeRatesService = exchangeRatesService;
+    public TradeService(ExchangeRateDtoService exchangeRateDtoService, CurrencyTransactionService transactionRepository) {
+        this.exchangeRateDtoService = exchangeRateDtoService;
         this.transactionRepository = transactionRepository;
     }
 
-    public Optional<TransactionDto> buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
+    public TransactionDto buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
         buyAmount = buyAmount.setScale(2, RoundingMode.HALF_EVEN);
         TransactionDto transaction = new TransactionDto();
-        Optional<ExchangeRateDTO> foundExchangeRateDTO = exchangeRatesService
+        ExchangeRateDTO foundExchangeRateDTO = exchangeRateDtoService
                 .getRecentExchangeRate(buyCurrencyCode, sellCurrencyCode);
-        if (foundExchangeRateDTO.isEmpty()) return Optional.empty();
-        RateDTO rate = foundExchangeRateDTO.get()
+        RateDTO rate = foundExchangeRateDTO
                 .getRates().get(0);
         BigDecimal soldAmount = rate.getRate().multiply(buyAmount);
         soldAmount = soldAmount.setScale(2, RoundingMode.HALF_EVEN);
@@ -41,7 +38,7 @@ public class TradeService {
         transaction.setBuyAmount(buyAmount);
         transaction.setDate(LocalDateTime.now());
         transactionRepository.addTransaction(transaction);
-        return Optional.of(transaction);
+        return transaction;
     }
 
     public List<TransactionDto> getTransactionsFromGivenDate(String date) {

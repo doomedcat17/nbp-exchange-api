@@ -23,12 +23,10 @@ public class TradeController {
     }
 
     @GetMapping("/{buyCurrencyCode}/{sellCurrencyCode}/{buyAmount}")
-    public ResponseEntity<TransactionDto> trade(@PathVariable(name = "sellCurrencyCode") String sellCurrencyCode,
+    public TransactionDto trade(@PathVariable(name = "sellCurrencyCode") String sellCurrencyCode,
                                                 @PathVariable(name = "buyCurrencyCode") String buyCurrencyCode,
                                                 @PathVariable(name = "buyAmount") String buyAmount) {
-        return ResponseEntity.of(
-                tradeService.buyCurrency(buyCurrencyCode.toUpperCase(), sellCurrencyCode.toUpperCase(), new BigDecimal(buyAmount))
-        );
+        return tradeService.buyCurrency(buyCurrencyCode.toUpperCase(), sellCurrencyCode.toUpperCase(), new BigDecimal(buyAmount));
     }
 
     @GetMapping("/history/{date}")
@@ -47,11 +45,8 @@ public class TradeController {
     }
 
     @PostMapping
-    public ResponseEntity<TransactionDto> tradePOST(@RequestBody SellRequestDto sellRequestDto) {
-        String missingParameter = sellRequestDto.getEmptyParameterName();
-        if (!missingParameter.isBlank()) throw new MissingRequestParameterException(missingParameter);
-        return ResponseEntity.of(tradeService.buyCurrency(sellRequestDto.getBuyCode().toUpperCase(),
-                sellRequestDto.getSellCode().toUpperCase(), new BigDecimal(sellRequestDto.getBuyAmount()))
-        );
+    public TransactionDto tradePOST(@RequestBody SellRequestDto sellRequestDto) {
+        return tradeService.buyCurrency(sellRequestDto.getBuyCode().toUpperCase(),
+                sellRequestDto.getSellCode().toUpperCase(), new BigDecimal(sellRequestDto.getBuyAmount()));
     }
 }

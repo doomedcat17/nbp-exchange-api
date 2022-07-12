@@ -4,8 +4,6 @@ import com.doomedcat17.nbpexchangeapi.data.Currency;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
-import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
-import com.doomedcat17.nbpexchangeapi.services.mapper.NbpExchangeRateToRateDTOMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,14 +15,17 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-class ExchangeRatesServiceTest extends ExchangeRatesService {
+class ExchangeRateDtoServiceTest {
+
+
+    @Autowired
+    private ExchangeRateDtoService exchangeRateDtoService;
 
     @Test
     void shouldReturnMostRecentRatesForGivenCode() {
@@ -33,11 +34,10 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         String currencyCode = "USD";
 
         //when
-        Optional<ExchangeRateDTO> foundExchangeRateDTO = getRecentExchangeRatesForCode(currencyCode);
+        ExchangeRateDTO exchangeRateDTO = exchangeRateDtoService.getRecentExchangeRatesForCode(currencyCode);
 
         //then
-        assertTrue(foundExchangeRateDTO.isPresent());
-        ExchangeRateDTO exchangeRateDTO = foundExchangeRateDTO.get();
+        assertFalse(exchangeRateDTO.getRates().isEmpty());
         assertEquals(currencyCode, exchangeRateDTO.getCode());
         List<RateDTO> rates = exchangeRateDTO.getRates();
 
@@ -56,10 +56,10 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         String currencyCode = "XD";
 
         //when
-        Optional<ExchangeRateDTO> foundExchangeRate = getRecentExchangeRatesForCode(currencyCode);
+        ExchangeRateDTO exchangeRateDTO = exchangeRateDtoService.getRecentExchangeRatesForCode(currencyCode);
 
         //then
-        assertTrue(foundExchangeRate.isEmpty());
+        assertTrue(exchangeRateDTO.getRates().isEmpty());
     }
 
     @Test
@@ -67,18 +67,17 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
 
         //given
         String currencyCode = "USD";
-        String dateText = "2021-11-30";
+        LocalDate date = LocalDate.of(2021, 11, 30);
 
         //when
-        Optional<ExchangeRateDTO> foundExchangeRateDTO = getAllExchangeRatesForCodeAndDate(currencyCode, dateText);
+        ExchangeRateDTO exchangeRateDTO = exchangeRateDtoService.getAllExchangeRatesForCodeAndDate(currencyCode, date);
 
         //then
 
-        assertTrue(foundExchangeRateDTO.isPresent());
-        ExchangeRateDTO exchangeRateDTO = foundExchangeRateDTO.get();
+        assertFalse(exchangeRateDTO.getRates().isEmpty());
         List<RateDTO> rates = exchangeRateDTO.getRates();
         assertEquals(3, rates.size());
-        assertTrue(rates.stream().allMatch(rate -> rate.getEffectiveDate().equals(LocalDate.parse(dateText))));
+        assertTrue(rates.stream().allMatch(rate -> rate.getEffectiveDate().equals(date)));
         assertTrue(rates.stream().noneMatch(rate -> rate.getCode().equals("USD")));
     }
 
@@ -91,21 +90,18 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         String targetAFNCode = "AFN";
 
         //when
-        Optional<ExchangeRateDTO> foundPlnExchangeRateDTO = getRecentExchangeRate(sourceCurrencyCode, targetPLNCode);
-        Optional<ExchangeRateDTO> foundAfnExchangeRateDTO = getRecentExchangeRate(sourceCurrencyCode, targetAFNCode);
+        ExchangeRateDTO PlnExchangeRateDTO = exchangeRateDtoService.getRecentExchangeRate(sourceCurrencyCode, targetPLNCode);
+        ExchangeRateDTO AfnExchangeRateDTO = exchangeRateDtoService.getRecentExchangeRate(sourceCurrencyCode, targetAFNCode);
 
         //then
-        assertTrue(foundPlnExchangeRateDTO.isPresent());
-        assertTrue(foundAfnExchangeRateDTO.isPresent());
+        assertFalse(PlnExchangeRateDTO.getRates().isEmpty());
+        assertFalse(AfnExchangeRateDTO.getRates().isEmpty());
 
-        ExchangeRateDTO plnExchangeRateDTO = foundPlnExchangeRateDTO.get();
-        ExchangeRateDTO afnExchangeRateDTO = foundAfnExchangeRateDTO.get();
+        assertEquals(sourceCurrencyCode, PlnExchangeRateDTO.getCode());
+        assertEquals(sourceCurrencyCode, AfnExchangeRateDTO.getCode());
 
-        assertEquals(sourceCurrencyCode, plnExchangeRateDTO.getCode());
-        assertEquals(sourceCurrencyCode, afnExchangeRateDTO.getCode());
-
-        List<RateDTO> plnRates = plnExchangeRateDTO.getRates();
-        List<RateDTO> afnRates = afnExchangeRateDTO.getRates();
+        List<RateDTO> plnRates = PlnExchangeRateDTO.getRates();
+        List<RateDTO> afnRates = AfnExchangeRateDTO.getRates();
         assertEquals(1, plnRates.size());
         assertEquals(1, afnRates.size());
 
@@ -127,12 +123,10 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         String dateText = "2021-11-30";
 
         //when
-        Optional<ExchangeRateDTO> foundPlnExchangeRateDTO = getExchangeRateForCodeAndDate(sourceCurrencyCode, targetPLNCode, dateText);
+        ExchangeRateDTO plnExchangeRateDTO = exchangeRateDtoService.getExchangeRateForCodeAndDate(sourceCurrencyCode, targetPLNCode, dateText);
 
         //then
-        assertTrue(foundPlnExchangeRateDTO.isPresent());
-
-        ExchangeRateDTO plnExchangeRateDTO = foundPlnExchangeRateDTO.get();
+        assertFalse(plnExchangeRateDTO.getRates().isEmpty());
         assertEquals(sourceCurrencyCode, plnExchangeRateDTO.getCode());
 
         List<RateDTO> plnRates = plnExchangeRateDTO.getRates();
@@ -153,12 +147,10 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         String targetPLNCode = "PLN";
 
         //when
-        Optional<ExchangeRateDTO> foundPlnExchangeRateDTO = getExchangeRatesForCodes(sourceCurrencyCode, targetPLNCode);
+        ExchangeRateDTO plnExchangeRateDTO = exchangeRateDtoService.getExchangeRatesForCodes(sourceCurrencyCode, targetPLNCode);
 
         //then
-        assertTrue(foundPlnExchangeRateDTO.isPresent());
-
-        ExchangeRateDTO plnExchangeRateDTO = foundPlnExchangeRateDTO.get();
+        assertFalse(plnExchangeRateDTO.getRates().isEmpty());
         assertEquals(sourceCurrencyCode, plnExchangeRateDTO.getCode());
 
         List<RateDTO> plnRates = plnExchangeRateDTO.getRates();
@@ -187,11 +179,11 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
                 LocalDate.parse("2021-11-25"));
 
         //when
-        Optional<RateDTO> foundUsdToPlnRateDTO = getRecentRate(usdExchangeRate, plnExchangeRate);
+        Optional<RateDTO> foundUsdToPlnRateDTO = exchangeRateDtoService.getRecentRate(usdExchangeRate, plnExchangeRate);
 
-        Optional<RateDTO> foundUsdToAfnRateDTO = getRecentRate(usdExchangeRate, afnExchangeRate);
+        Optional<RateDTO> foundUsdToAfnRateDTO = exchangeRateDtoService.getRecentRate(usdExchangeRate, afnExchangeRate);
 
-        Optional<RateDTO> foundAfnToPlnRateDTO = getRecentRate(afnExchangeRate, plnExchangeRate);
+        Optional<RateDTO> foundAfnToPlnRateDTO = exchangeRateDtoService.getRecentRate(afnExchangeRate, plnExchangeRate);
 
         //then
         assertTrue(foundUsdToPlnRateDTO.isPresent());
@@ -214,10 +206,6 @@ class ExchangeRatesServiceTest extends ExchangeRatesService {
         assertEquals(afnToPlnRateDTO.getEffectiveDate(), afnExchangeRate.getEffectiveDate());
     }
 
-    @Autowired
-    public ExchangeRatesServiceTest(NbpExchangeRateRepository nbpExchangeRateRepository, NbpExchangeRateToRateDTOMapper nbpExchangeRateToRateDTOMapper) {
-        super(nbpExchangeRateRepository, nbpExchangeRateToRateDTOMapper);
-    }
 
 
 }

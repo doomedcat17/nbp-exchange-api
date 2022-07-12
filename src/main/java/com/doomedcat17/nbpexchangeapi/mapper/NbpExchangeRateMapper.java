@@ -18,6 +18,7 @@ public interface NbpExchangeRateMapper {
     NbpExchangeRate fromJson(JsonNode jsonNode, LocalDate effectiveDate);
 
     @Mapping(target = "rate", source = "exchangeRateToMap", qualifiedByName = "rate")
+    @Mapping(target = "code", source = "exchangeRateToMap.currency.code")
     RateDTO toRateDto(NbpExchangeRate exchangeRateToMap, @Context NbpExchangeRate baseExchangeRate);
 
     @Named("rate")
