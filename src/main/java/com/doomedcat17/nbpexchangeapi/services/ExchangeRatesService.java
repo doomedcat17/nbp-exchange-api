@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -33,12 +34,11 @@ public class ExchangeRatesService {
         return Optional.of(exchangeRateDTO);
     }
 
-    public Optional<ExchangeRateDTO> getAllExchangeRatesForCodeAndDate(String currencyCode, String textDate) {
+    public Optional<ExchangeRateDTO> getAllExchangeRatesForCodeAndDate(String currencyCode, LocalDate effectiveDate) {
         List<NbpExchangeRate> exchangeRates;
-        if (textDate.isBlank()) {
+        if (Objects.isNull(effectiveDate)) {
             exchangeRates = nbpExchangeRateRepository.getAllByCurrencyCode(currencyCode);
         } else {
-            LocalDate effectiveDate = LocalDate.parse(textDate);
             Optional<NbpExchangeRate> foundExchangeRate = nbpExchangeRateRepository
                     .getByCurrencyCodeAndEffectiveDate(currencyCode, effectiveDate);
             exchangeRates = foundExchangeRate.map(List::of).orElseGet(List::of);

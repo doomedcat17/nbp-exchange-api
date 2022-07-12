@@ -2,8 +2,11 @@ package com.doomedcat17.nbpexchangeapi.controllers;
 
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.services.ExchangeRatesService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/rates")
@@ -23,7 +26,7 @@ public class RatesController {
 
     @GetMapping("/{currencyCode}/all")
     public ResponseEntity<ExchangeRateDTO> allRates(@PathVariable(name = "currencyCode") String currencyCode,
-                                                    @RequestParam(name = "effectiveDate", required = false, defaultValue = "") String effectiveDate) {
+                                                    @RequestParam(name = "effectiveDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate effectiveDate) {
         currencyCode = currencyCode.toUpperCase();
         return ResponseEntity.of(exchangeRatesService. getAllExchangeRatesForCodeAndDate(currencyCode, effectiveDate));
     }
