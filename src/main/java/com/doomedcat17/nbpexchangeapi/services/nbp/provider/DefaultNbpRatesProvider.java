@@ -8,6 +8,8 @@ import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.AllArgsConstructor;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -24,7 +26,7 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
 
     private final WorkWeekStartDateProvider workWeekStartDateProvider;
 
-    private final NbpExchangeRateMapper mapper;
+    private final NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
 
     private final Set<String> tableNames = Set.of("a", "b");
 

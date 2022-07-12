@@ -41,14 +41,11 @@ public class TradeService {
         return transaction;
     }
 
-    public List<TransactionDto> getTransactionsFromGivenDate(String date) {
-        LocalDate transactionDate = LocalDate.parse(date);
-        return transactionRepository.getAllByDate(transactionDate);
+    public List<TransactionDto> getTransactionsFromGivenDate(LocalDate date) {
+        return transactionRepository.getAllByDate(date);
     }
 
-    public List<TransactionDto> getTransactionsFromGivenDates(String startDate, String endDate) {
-        LocalDate transactionStartDate = LocalDate.parse(startDate);
-        LocalDate transactionEndDate= LocalDate.parse(endDate);
-        return transactionRepository.getAllFromGivenDates(transactionStartDate, transactionEndDate);
+    public List<TransactionDto> getTransactionsFromGivenDates(LocalDate startDate, LocalDate endDate) {
+        return transactionRepository.getAllFromGivenDates(startDate, endDate);
     }
 }

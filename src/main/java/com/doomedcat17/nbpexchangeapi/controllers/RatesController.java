@@ -2,6 +2,7 @@ package com.doomedcat17.nbpexchangeapi.controllers;
 
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.services.ExchangeRateDtoService;
+import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,13 +10,10 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/rates")
+@AllArgsConstructor
 public class RatesController {
 
     private final ExchangeRateDtoService exchangeRateDtoService;
-
-    public RatesController(ExchangeRateDtoService exchangeRateDtoService) {
-        this.exchangeRateDtoService = exchangeRateDtoService;
-    }
 
     @GetMapping("/{currencyCode}/recent")
     public ExchangeRateDTO recentRates(@PathVariable(name = "currencyCode") String currencyCode) {

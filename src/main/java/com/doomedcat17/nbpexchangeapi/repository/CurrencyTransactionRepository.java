@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -18,5 +19,5 @@ public interface CurrencyTransactionRepository extends JpaRepository<CurrencyTra
     List<CurrencyTransaction> getAllByDateYearAndDateMonthAndDateDay(@Param("year") Integer year, @Param("month") Integer month, @Param("day") Integer day);
 
     @Query("SELECT transaction FROM CurrencyTransaction transaction WHERE transaction.date BETWEEN :startDate AND :endDate")
-    List<CurrencyTransaction> getAllBetweenDates(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    List<CurrencyTransaction> getAllBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

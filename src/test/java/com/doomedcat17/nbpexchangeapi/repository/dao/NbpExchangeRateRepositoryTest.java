@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,11 +67,12 @@ class NbpExchangeRateRepositoryTest {
         //given
         LocalDate date = LocalDate.parse("2021-11-25");
         //when
-        NbpExchangeRate foundExchangeRate = nbpExchangeRateRepository.getByCurrencyCodeAndEffectiveDate("USD", date);
+        Optional<NbpExchangeRate> foundExchangeRate = nbpExchangeRateRepository.getByCurrencyCodeAndEffectiveDate("USD", date);
 
         //then
-        assertEquals("USD", foundExchangeRate.getCurrency().getCode());
-        assertEquals(date, foundExchangeRate.getEffectiveDate());
+        assertTrue(foundExchangeRate.isPresent());
+        assertEquals("USD", foundExchangeRate.get().getCurrency().getCode());
+        assertEquals(date, foundExchangeRate.get().getEffectiveDate());
 
     }
 

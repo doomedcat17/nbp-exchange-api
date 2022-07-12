@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,7 +54,7 @@ class CurrencyTransactionServiceTest {
         //then
         assertEquals("USD", foundTransaction.getBuyCode());
         assertEquals("PLN", foundTransaction.getSellCode());
-        assertEquals(new Date(1638442800000L), foundTransaction.getDate());
+        assertEquals(LocalDateTime.of(LocalDate.of(2021, 12, 2), LocalTime.NOON), foundTransaction.getDate());
     }
 
     @Test
@@ -79,11 +80,11 @@ class CurrencyTransactionServiceTest {
         List<TransactionDto> foundTransactions = currencyTransactionService.getAllFromGivenDates(startDate ,endDate);
 
         //then
-        LocalDateTime dateAfterEndDate = LocalDateTime.parse("2021-12-03");
+        LocalDateTime dateAfterEndDate = LocalDateTime.of(endDate.plusDays(1), LocalTime.MAX);
         assertTrue(foundTransactions
                 .stream().allMatch(transactionDto ->
-                        !transactionDto.getDate().isBefore(LocalDateTime.from(startDate))
-                                && (!transactionDto.getDate().equals(endDate) || !transactionDto.getDate().isAfter(dateAfterEndDate))));
+                        !transactionDto.getDate().isBefore(LocalDateTime.of(startDate, LocalTime.MIN))
+                                && (!transactionDto.getDate().toLocalDate().equals(endDate) || !transactionDto.getDate().isAfter(dateAfterEndDate))));
         assertEquals(5, foundTransactions.size());
     }
 }

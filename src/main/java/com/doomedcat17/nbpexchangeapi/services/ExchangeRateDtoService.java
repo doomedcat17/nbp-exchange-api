@@ -3,12 +3,10 @@ package com.doomedcat17.nbpexchangeapi.services;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
-import com.doomedcat17.nbpexchangeapi.exceptions.CurrencyNotFoundException;
 import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
 import com.doomedcat17.nbpexchangeapi.services.mapper.NbpExchangeRateToRateDTOMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +21,7 @@ public class ExchangeRateDtoService {
 
     private final NbpExchangeRateToRateDTOMapper nbpExchangeRateToRateDTOMapper;
 
-    private final NbpExchangeRateMapper mapper;
+    private final NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
 
 
     public ExchangeRateDTO getRecentExchangeRatesForCode(String code) {
@@ -66,10 +64,10 @@ public class ExchangeRateDtoService {
         if (sourceCurrencyCode.equals(targetCurrencyCode)) return exchangeRateDTO;
         Optional<NbpExchangeRate> sourceExchangeRate =
                 exchangeRateService.getMostRecentByCurrencyCode(sourceCurrencyCode);
-        if (sourceExchangeRate.isEmpty()) throw new CurrencyNotFoundException(sourceCurrencyCode);
+        if (sourceExchangeRate.isEmpty()) return exchangeRateDTO;
         Optional<NbpExchangeRate> targetExchangeRate =
                 exchangeRateService.getMostRecentByCurrencyCode(targetCurrencyCode);
-        if (targetExchangeRate.isEmpty()) throw new CurrencyNotFoundException(targetCurrencyCode);
+        if (targetExchangeRate.isEmpty()) return exchangeRateDTO;
         getRecentRate(sourceExchangeRate.get(), targetExchangeRate.get()).ifPresent(
                         rateDTO -> exchangeRateDTO.setRates(List.of(rateDTO)));
         return exchangeRateDTO;

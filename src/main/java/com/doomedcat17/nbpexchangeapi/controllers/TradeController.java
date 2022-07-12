@@ -2,13 +2,14 @@ package com.doomedcat17.nbpexchangeapi.controllers;
 
 import com.doomedcat17.nbpexchangeapi.data.dto.SellRequestDto;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.exceptions.MissingRequestParameterException;
 import com.doomedcat17.nbpexchangeapi.services.TradeService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -30,22 +31,22 @@ public class TradeController {
     }
 
     @GetMapping("/history/{date}")
-    public ResponseEntity<List<TransactionDto>> getAllTransactionsFromDate(@PathVariable(name = "date") String date) {
+    public List<TransactionDto> getAllTransactionsFromDate(@PathVariable(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<TransactionDto> transactions = tradeService.getTransactionsFromGivenDate(date);
-        if (transactions.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
+        if (transactions.isEmpty()) return List.of();
+        return transactions;
     }
 
     @GetMapping("/history/{startDate}/{endDate}")
-    public ResponseEntity<List<TransactionDto>> getAllTransactionsFromDates(@PathVariable(name = "startDate") String startDate,
-                                                            @PathVariable(name = "endDate") String endDate) {
+    public List<TransactionDto> getAllTransactionsFromDates(@PathVariable(name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                            @PathVariable(name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         List<TransactionDto> transactions = tradeService.getTransactionsFromGivenDates(startDate, endDate);
-        if (transactions.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        return new ResponseEntity<>(transactions, HttpStatus.OK);
+        if (transactions.isEmpty()) return List.of();
+        return transactions;
     }
 
     @PostMapping
-    public TransactionDto tradePOST(@RequestBody SellRequestDto sellRequestDto) {
+    public TransactionDto tradePost(@RequestBody SellRequestDto sellRequestDto) {
         return tradeService.buyCurrency(sellRequestDto.getBuyCode().toUpperCase(),
                 sellRequestDto.getSellCode().toUpperCase(), new BigDecimal(sellRequestDto.getBuyAmount()));
     }

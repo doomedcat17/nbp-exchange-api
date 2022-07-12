@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -143,11 +145,12 @@ class TradeControllerTest {
     @Test
     void shouldReturnHistoryFromGivenDate() {
         //given
-        LocalDate date = LocalDate.parse("2021-11-29");
+        String textDate = "2021-11-29";
+        LocalDate date = LocalDate.parse(textDate);
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/trade/history/{date}", date))
+                .perform(get("/api/trade/history/{textDate}", textDate))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
         //then
@@ -157,8 +160,8 @@ class TradeControllerTest {
 
         assertEquals(2, transactions.size());
         assertTrue(transactions.stream().allMatch(
-                transactionDto -> transactionDto.getDate().isAfter(LocalDateTime.from(date.minusDays(1)))
-                        && transactionDto.getDate().isBefore(LocalDateTime.from(date.plusDays(1)))
+                transactionDto -> transactionDto.getDate().isAfter(date.minusDays(1).atTime(LocalTime.MIN))
+                        && transactionDto.getDate().isBefore(LocalDateTime.from(date.plusDays(1).atTime(LocalTime.MAX)))
         ));
     }
 
@@ -209,7 +212,8 @@ class TradeControllerTest {
 
         assertEquals(4, transactions.size());
         assertTrue(transactions.stream().allMatch(
-                transactionDto -> transactionDto.getDate().isAfter(LocalDateTime.from(startDate)) && transactionDto.getDate().isBefore(LocalDateTime.from(endDate))
+                transactionDto -> transactionDto.getDate().isAfter(LocalDateTime.of(startDate, LocalTime.MIN))
+                        && transactionDto.getDate().isBefore(LocalDateTime.of(endDate, LocalTime.MAX))
         ));
     }
 

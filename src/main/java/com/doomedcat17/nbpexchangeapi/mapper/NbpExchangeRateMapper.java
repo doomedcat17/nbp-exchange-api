@@ -4,13 +4,17 @@ import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN, injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = {CurrencyMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.WARN, injectionStrategy = InjectionStrategy.CONSTRUCTOR, uses = {CurrencyMapper.class})
 public interface NbpExchangeRateMapper {
+
+
+    NbpExchangeRateMapper INSTANCE = Mappers.getMapper(NbpExchangeRateMapper.class);
 
     @Mapping(target = "midRateInPLN", source = "jsonNode", qualifiedByName = "midRateInPLN")
     @Mapping(target = "effectiveDate", source = "effectiveDate")

@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -48,7 +50,7 @@ public class CurrencyTransactionService {
 
     public List<TransactionDto> getAllFromGivenDates(LocalDate startDate, LocalDate endDate) {
         List<CurrencyTransaction> currencyTransactions =
-                currencyTransactionRepository.getAllBetweenDates(startDate, endDate);
+                currencyTransactionRepository.getAllBetweenDates(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX));
         return currencyTransactions.stream()
                 .map(mapper::toDto)
                 .toList();

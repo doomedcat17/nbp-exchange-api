@@ -2,9 +2,13 @@ package com.doomedcat17.nbpexchangeapi.controllers;
 
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -73,7 +77,8 @@ class RatesControllerTest {
                 .andExpect(result1 -> status().isNotFound()).andReturn();
 
         //then
-        assertTrue(result.getResponse().getContentAsString().isEmpty());
+        JsonNode arrayNode = objectMapper.readTree(result.getResponse().getContentAsString()).get("rates");
+        assertTrue(arrayNode.isEmpty());
     }
 
     @SneakyThrows
@@ -89,7 +94,8 @@ class RatesControllerTest {
                 .andExpect(result1 -> status().isNotFound()).andReturn();
 
         //then
-        assertTrue(result.getResponse().getContentAsString().isEmpty());
+        JsonNode arrayNode = objectMapper.readTree(result.getResponse().getContentAsString()).get("rates");
+        assertTrue(arrayNode.isEmpty());
     }
 
     @SneakyThrows
@@ -200,51 +206,25 @@ class RatesControllerTest {
 
 
     @SneakyThrows
-    @Test
-    void shouldNOTReturnRecentExchangeRatesForGivenCodes() {
+    @ParameterizedTest
+    @CsvSource(value = {"/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/recent", "/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/recent",
+    "/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/2021-11-30", "/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/2021-11-30",
+    "/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/all", "/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/all"})
+    void shouldNOTReturnRecentExchangeRatesForGivenCodes(String url) {
         //given
         String sourceCurrencyCode = "XDD";
 
         String targetCurrencyCode = "CO";
 
         //when
-        MvcResult result1 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/recent",
-                        sourceCurrencyCode, targetCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
+        MvcResult result = mockMvc
+                .perform(get(url,
+                        sourceCurrencyCode, targetCurrencyCode)).andReturn();
 
-        MvcResult result2 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/recent",
-                        sourceCurrencyCode, sourceCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result3 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/2021-11-30",
-                        sourceCurrencyCode, targetCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result4 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/2021-11-30",
-                        sourceCurrencyCode, sourceCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result5 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/all",
-                        sourceCurrencyCode, targetCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result6 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/all",
-                        sourceCurrencyCode, sourceCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
+        JsonNode rates = objectMapper.readTree(result.getResponse().getContentAsString()).get("rates");
 
         //then
-        assertTrue(result1.getResponse().getContentAsString().isEmpty());
-        assertTrue(result2.getResponse().getContentAsString().isEmpty());
-        assertTrue(result3.getResponse().getContentAsString().isEmpty());
-        assertTrue(result4.getResponse().getContentAsString().isEmpty());
-        assertTrue(result5.getResponse().getContentAsString().isEmpty());
-        assertTrue(result6.getResponse().getContentAsString().isEmpty());
+        assertTrue(rates.isEmpty());
     }
 
 

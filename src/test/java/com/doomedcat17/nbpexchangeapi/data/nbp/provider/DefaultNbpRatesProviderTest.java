@@ -2,6 +2,7 @@ package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.TestDataProvider;
 import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.DefaultNbpRatesProvider;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.table.DefaultNbpTableProvider;
 import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
@@ -9,9 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
@@ -29,6 +32,9 @@ class DefaultNbpRatesProviderTest {
 
     @Mock
     private WorkWeekStartDateProvider workWeekStartDateProvider;
+
+    @Spy
+    NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
 
     @InjectMocks
     private DefaultNbpRatesProvider npbCurrencyProvider;
