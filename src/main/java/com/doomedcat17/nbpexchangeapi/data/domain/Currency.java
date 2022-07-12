@@ -1,4 +1,4 @@
-package com.doomedcat17.nbpexchangeapi.data;
+package com.doomedcat17.nbpexchangeapi.data.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +18,6 @@ public class Currency {
 
     @Id
     private String code;
-
     private String name;
 
     @Override

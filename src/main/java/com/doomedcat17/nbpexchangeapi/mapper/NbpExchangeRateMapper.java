@@ -1,6 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.mapper;
 
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.mapstruct.*;

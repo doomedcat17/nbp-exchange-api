@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.services;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import org.junit.jupiter.api.Test;

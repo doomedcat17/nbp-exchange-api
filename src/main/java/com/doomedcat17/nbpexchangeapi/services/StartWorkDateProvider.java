@@ -6,10 +6,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 @Component
-public class WorkWeekStartDateProvider {
+public class StartWorkDateProvider {
 
-    public LocalDate get(LocalDate now) {
-        int remainingDays = 7;
+    public LocalDate get(LocalDate now, int workdaysNumber) {
+        int remainingDays = workdaysNumber;
         LocalDate startDate;
         LocalDate temp = now;
         do {

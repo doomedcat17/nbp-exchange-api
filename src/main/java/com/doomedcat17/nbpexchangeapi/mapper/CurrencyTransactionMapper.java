@@ -1,6 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.mapper;
 
-import com.doomedcat17.nbpexchangeapi.data.CurrencyTransaction;
+import com.doomedcat17.nbpexchangeapi.data.domain.CurrencyTransaction;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

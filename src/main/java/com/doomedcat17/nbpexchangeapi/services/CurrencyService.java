@@ -1,6 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.services;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
+import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
 import com.doomedcat17.nbpexchangeapi.repository.CurrencyRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

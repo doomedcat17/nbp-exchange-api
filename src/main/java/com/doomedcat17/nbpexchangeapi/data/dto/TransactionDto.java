@@ -1,6 +1,5 @@
 package com.doomedcat17.nbpexchangeapi.data.dto;
 
-import com.doomedcat17.nbpexchangeapi.data.CurrencyTransaction;
 import lombok.Getter;
 import lombok.Setter;
 

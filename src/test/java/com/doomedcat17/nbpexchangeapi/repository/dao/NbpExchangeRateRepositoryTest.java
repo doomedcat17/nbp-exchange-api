@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.repository.dao;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

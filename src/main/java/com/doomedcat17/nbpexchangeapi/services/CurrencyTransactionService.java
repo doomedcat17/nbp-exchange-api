@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.services;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
-import com.doomedcat17.nbpexchangeapi.data.CurrencyTransaction;
+import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
+import com.doomedcat17.nbpexchangeapi.data.domain.CurrencyTransaction;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.doomedcat17.nbpexchangeapi.mapper.CurrencyTransactionMapper;
 import com.doomedcat17.nbpexchangeapi.repository.CurrencyRepository;

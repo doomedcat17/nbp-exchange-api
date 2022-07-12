@@ -1,15 +1,13 @@
 package com.doomedcat17.nbpexchangeapi.services.nbp.provider;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.table.NbpTableProvider;
-import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
+import com.doomedcat17.nbpexchangeapi.services.StartWorkDateProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.AllArgsConstructor;
-import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -24,7 +22,7 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
 
     private final NbpTableProvider nbpTableProvider;
 
-    private final WorkWeekStartDateProvider workWeekStartDateProvider;
+    private final StartWorkDateProvider startWorkDateProvider;
 
     private final NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
 
@@ -33,7 +31,7 @@ public class DefaultNbpRatesProvider implements NbpRatesProvider {
     //work days only!!
     @Override
     public Set<NbpExchangeRate> getNbpExchangeRatesFromLastWeek(LocalDate now){
-        LocalDate startDate = workWeekStartDateProvider.get(now);
+        LocalDate startDate = startWorkDateProvider.get(now, 7);
         Set<NbpExchangeRate> exchangeRates = new HashSet<>();
         try {
             for (String tableName : tableNames) {

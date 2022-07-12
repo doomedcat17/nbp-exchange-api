@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.services;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +19,7 @@ public class ExchangeRateService {
 
     private final NbpExchangeRateRepository nbpExchangeRateRepository;
 
-    private final WorkWeekStartDateProvider workWeekStartDateProvider;
+    private final StartWorkDateProvider startWorkDateProvider;
 
     private CurrencyService currencyService;
 
@@ -40,8 +40,8 @@ public class ExchangeRateService {
         return nbpExchangeRateRepository.getAllByCurrencyCode(currencyCode);
     }
 
-    public void removeAllOlderThanWeek() {
-        nbpExchangeRateRepository.deleteAllByEffectiveDateBefore(workWeekStartDateProvider.get(LocalDate.now()));
+    public void removeAllOlderThanGivenDate(LocalDate date) {
+        nbpExchangeRateRepository.deleteAllByEffectiveDateBefore(date);
     }
 
     public long getSize() {

@@ -1,6 +1,5 @@
-package com.doomedcat17.nbpexchangeapi.data;
+package com.doomedcat17.nbpexchangeapi.data.domain;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

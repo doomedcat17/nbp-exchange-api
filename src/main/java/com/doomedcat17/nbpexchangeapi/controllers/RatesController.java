@@ -5,7 +5,6 @@ import com.doomedcat17.nbpexchangeapi.services.ExchangeRateDtoService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 
 @RestController

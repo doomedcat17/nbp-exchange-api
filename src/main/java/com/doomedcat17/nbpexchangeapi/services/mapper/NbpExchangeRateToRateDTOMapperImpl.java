@@ -1,6 +1,6 @@
 package com.doomedcat17.nbpexchangeapi.services.mapper;
 
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import org.springframework.stereotype.Component;
 
