@@ -6,6 +6,7 @@ import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
 import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
 import com.doomedcat17.nbpexchangeapi.services.mapper.NbpExchangeRateToRateDTOMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class ExchangeRateDtoService {
     private final NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
 
 
+    @Cacheable(cacheNames = "rateDtos", key = "#code")
     public ExchangeRateDTO getRecentExchangeRatesForCode(String code) {
         List<RateDTO> rates = getRecentRatesForCurrency(code);
         ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
@@ -58,6 +60,7 @@ public class ExchangeRateDtoService {
         return exchangeRateDTO;
     }
 
+    @Cacheable(cacheNames = "rateExchangeDto", key = "#sourceCurrencyCode.concat(#targetCurrencyCode)")
     public ExchangeRateDTO getRecentExchangeRate(String sourceCurrencyCode, String targetCurrencyCode) {
         ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
         exchangeRateDTO.setCode(sourceCurrencyCode);
@@ -73,16 +76,15 @@ public class ExchangeRateDtoService {
         return exchangeRateDTO;
     }
 
-    public ExchangeRateDTO getExchangeRateForCodeAndDate(String sourceCurrencyCode, String targetCurrencyCode, String textDate) {
+    public ExchangeRateDTO getExchangeRateForCodeAndDate(String sourceCurrencyCode, String targetCurrencyCode, LocalDate effectiveDate) {
         ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
         exchangeRateDTO.setCode(sourceCurrencyCode);
         if (sourceCurrencyCode.equals(targetCurrencyCode)) return exchangeRateDTO;
-        LocalDate date = LocalDate.parse(textDate);
 
         Optional<NbpExchangeRate> sourceExchangeRate =
-                exchangeRateService.getByCurrencyCodeAndEffectiveDate(sourceCurrencyCode, date);
+                exchangeRateService.getByCurrencyCodeAndEffectiveDate(sourceCurrencyCode, effectiveDate);
         Optional<NbpExchangeRate> targetExchangeRate =
-                exchangeRateService.getByCurrencyCodeAndEffectiveDate(targetCurrencyCode, date);
+                exchangeRateService.getByCurrencyCodeAndEffectiveDate(targetCurrencyCode, effectiveDate);
         if (sourceExchangeRate.isEmpty() || targetExchangeRate.isEmpty()) return exchangeRateDTO;
 
         List<RateDTO> rates = List.of(

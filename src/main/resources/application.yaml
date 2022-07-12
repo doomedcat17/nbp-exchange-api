@@ -1,4 +1,6 @@
 spring:
+  cache:
+    type: simple
   jpa:
     generate-ddl: false
     hibernate:

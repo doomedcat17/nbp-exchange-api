@@ -36,13 +36,13 @@ public class RatesController {
         return exchangeRateDtoService.getRecentExchangeRate(sourceCurrencyCode, targetCurrencyCode);
     }
 
-    @GetMapping("/{sourceCurrencyCode}/{targetCurrencyCode}/{date}")
+    @GetMapping("/{sourceCurrencyCode}/{targetCurrencyCode}/{effectiveDate}")
     public ExchangeRateDTO rateForCodeAndDate(@PathVariable(name = "sourceCurrencyCode") String sourceCurrencyCode,
                                         @PathVariable(name = "targetCurrencyCode") String targetCurrencyCode,
-                                                @PathVariable(name = "date") String date) {
+                                                @PathVariable(name = "effectiveDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate effectiveDate) {
         sourceCurrencyCode = sourceCurrencyCode.toUpperCase();
         targetCurrencyCode = targetCurrencyCode.toUpperCase();
-        return exchangeRateDtoService.getExchangeRateForCodeAndDate(sourceCurrencyCode, targetCurrencyCode, date);
+        return exchangeRateDtoService.getExchangeRateForCodeAndDate(sourceCurrencyCode, targetCurrencyCode, effectiveDate);
     }
 
     @GetMapping("/{currencyCode}/{targetCurrencyCode}/all")

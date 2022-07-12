@@ -4,6 +4,9 @@ import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
 import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +22,12 @@ public class ExchangeRateService {
 
     private final NbpExchangeRateRepository nbpExchangeRateRepository;
 
-    private final StartWorkDateProvider startWorkDateProvider;
-
     private CurrencyService currencyService;
 
+    @Caching(evict = {
+            @CacheEvict(cacheNames = {"allRecentRates", "ratesSize", "rateExchangeDto"}, allEntries = true),
+            @CacheEvict(cacheNames = {"recentRates", "rateDtos"}, key = "#nbpExchangeRate.currency.code")
+    })
     public void add(NbpExchangeRate nbpExchangeRate) {
         Optional<NbpExchangeRate> presentExchangeRate =
                 getByCurrencyCodeAndEffectiveDate(
@@ -44,10 +49,12 @@ public class ExchangeRateService {
         nbpExchangeRateRepository.deleteAllByEffectiveDateBefore(date);
     }
 
+    @Cacheable(cacheNames = "ratesSize")
     public long getSize() {
         return nbpExchangeRateRepository.count();
     }
 
+    @Cacheable(cacheNames = "allRecentRates")
     public List<NbpExchangeRate> getMostRecent() {
         return nbpExchangeRateRepository.getRecent();
     }
@@ -60,7 +67,7 @@ public class ExchangeRateService {
     public List<NbpExchangeRate> getAllByEffectiveDate(LocalDate effectiveDate) {
         return nbpExchangeRateRepository.getAllByEffectiveDate(effectiveDate);
     }
-
+    @Cacheable(cacheNames = "recentRates", key = "#currencyCode")
     public Optional<NbpExchangeRate> getMostRecentByCurrencyCode(String currencyCode) {
         List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateRepository.getMostRecentByCode(currencyCode, PageRequest.of(0, 1));
         if (!foundExchangeRates.isEmpty()) return Optional.of(foundExchangeRates.get(0));
