@@ -2,14 +2,15 @@ package com.doomedcat17.nbpexchangeapi.services.mapper;
 
 import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
 import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.doomedcat17.nbpexchangeapi.data.dto.RateDto;
 import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class NbpExchangeRateToRateDTOMapperImplTest {
+class NbpExchangeRateToRateDtoMapperImplTest {
 
     private final NbpExchangeRateToRateDTOMapperImpl nbpExchangeRateToRateDTOMapper =
             new NbpExchangeRateToRateDTOMapperImpl();
@@ -28,13 +29,13 @@ class NbpExchangeRateToRateDTOMapperImplTest {
         exchangeRateToMap.setEffectiveDate(LocalDate.parse("2021-11-25"));
 
         //when
-        RateDTO rateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(exchangeRateToMap, baseExchangeRate);
+        RateDto rateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(exchangeRateToMap, baseExchangeRate);
 
-        RateDTO reversedRateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(baseExchangeRate, exchangeRateToMap);
+        RateDto reversedRateDto = nbpExchangeRateToRateDTOMapper.mapToRate(baseExchangeRate, exchangeRateToMap);
 
         //then
         assertEquals(new BigDecimal("115.36"), rateDTO.getRate());
-        assertEquals(new BigDecimal("0.008669"), reversedRateDTO.getRate());
+        assertEquals(new BigDecimal("0.008669"), reversedRateDto.getRate());
     }
 
     @Test
@@ -51,13 +52,13 @@ class NbpExchangeRateToRateDTOMapperImplTest {
         exchangeRateToMap.setEffectiveDate(LocalDate.parse("2021-11-25"));
 
         //when
-        RateDTO rateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(exchangeRateToMap, baseExchangeRate);
+        RateDto rateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(exchangeRateToMap, baseExchangeRate);
 
-        RateDTO reversedRateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(baseExchangeRate, exchangeRateToMap);
+        RateDto reversedRateDto = nbpExchangeRateToRateDTOMapper.mapToRate(baseExchangeRate, exchangeRateToMap);
 
         //then
         assertEquals(new BigDecimal("83.19"), rateDTO.getRate());
-        assertEquals(new BigDecimal("0.012021"), reversedRateDTO.getRate());
+        assertEquals(new BigDecimal("0.012021"), reversedRateDto.getRate());
     }
 
     @Test
@@ -74,13 +75,13 @@ class NbpExchangeRateToRateDTOMapperImplTest {
         exchangeRateToMap.setEffectiveDate(LocalDate.parse("2021-11-25"));
 
         //when
-        RateDTO rateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(exchangeRateToMap, baseExchangeRate);
+        RateDto rateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(exchangeRateToMap, baseExchangeRate);
 
-        RateDTO reversedRateDTO = nbpExchangeRateToRateDTOMapper.mapToRate(baseExchangeRate, exchangeRateToMap);
+        RateDto reversedRateDto = nbpExchangeRateToRateDTOMapper.mapToRate(baseExchangeRate, exchangeRateToMap);
 
         //then
         assertEquals(new BigDecimal("1.228662"), rateDTO.getRate());
-        assertEquals(new BigDecimal("0.813894"), reversedRateDTO.getRate());
+        assertEquals(new BigDecimal("0.813894"), reversedRateDto.getRate());
     }
 
 

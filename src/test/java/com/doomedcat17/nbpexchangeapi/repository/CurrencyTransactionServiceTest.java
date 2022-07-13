@@ -8,14 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Sql(scripts = {"classpath:schema.sql", "classpath:data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -45,46 +40,4 @@ class CurrencyTransactionServiceTest {
         assertEquals(10, currencyTransactionRepository.count());
     }
 
-    @Test
-    void shouldReturnLatestTransaction() {
-
-        //when
-        TransactionDto foundTransaction = currencyTransactionService.getLatestTransaction();
-
-        //then
-        assertEquals("USD", foundTransaction.getBuyCode());
-        assertEquals("PLN", foundTransaction.getSellCode());
-        assertEquals(LocalDateTime.of(LocalDate.of(2021, 12, 2), LocalTime.NOON), foundTransaction.getDate());
-    }
-
-    @Test
-    void shouldReturnTransactionsFromGivenDate() {
-
-        LocalDate expectedDate = LocalDate.parse("2021-11-29");
-
-        //when
-        List<TransactionDto> foundTransactions = currencyTransactionService.getAllByDate(expectedDate);
-
-        //then
-        assertEquals(2, foundTransactions.size());
-    }
-
-    @Test
-    void shouldReturnAllBetweenGivenDates() {
-
-        //given
-        LocalDate startDate = LocalDate.parse("2021-11-29");
-        LocalDate endDate = LocalDate.parse("2021-12-02");
-
-        //when
-        List<TransactionDto> foundTransactions = currencyTransactionService.getAllFromGivenDates(startDate ,endDate);
-
-        //then
-        LocalDateTime dateAfterEndDate = LocalDateTime.of(endDate.plusDays(1), LocalTime.MAX);
-        assertTrue(foundTransactions
-                .stream().allMatch(transactionDto ->
-                        !transactionDto.getDate().isBefore(LocalDateTime.of(startDate, LocalTime.MIN))
-                                && (!transactionDto.getDate().toLocalDate().equals(endDate) || !transactionDto.getDate().isAfter(dateAfterEndDate))));
-        assertEquals(5, foundTransactions.size());
-    }
 }

@@ -6,6 +6,7 @@ import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
@@ -55,10 +56,10 @@ class NbpExchangeRateRepositoryTest {
     @Test
     void shouldReturnAllWithMatchingCode() {
         //when
-        List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateRepository.getAllByCurrencyCode("USD");
+        Page<NbpExchangeRate> foundExchangeRates = nbpExchangeRateRepository.getAllByCurrencyCode("USD", PageRequest.of(0, 50));
 
         //then
-        assertEquals(10, foundExchangeRates.size());
+        assertEquals(10, foundExchangeRates.getContent().size());
 
     }
 

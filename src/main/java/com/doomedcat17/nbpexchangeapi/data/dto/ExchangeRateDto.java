@@ -7,9 +7,9 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ExchangeRateDTO {
+public class ExchangeRateDto {
 
     private String code;
 
-    private List<RateDTO> rates;
+    private List<RateDto> rates;
 }

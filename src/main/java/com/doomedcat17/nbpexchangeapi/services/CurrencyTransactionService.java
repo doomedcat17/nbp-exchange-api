@@ -3,30 +3,28 @@ package com.doomedcat17.nbpexchangeapi.services;
 import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
 import com.doomedcat17.nbpexchangeapi.data.domain.CurrencyTransaction;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.mapper.CurrencyTransactionMapper;
-import com.doomedcat17.nbpexchangeapi.repository.CurrencyRepository;
 import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class CurrencyTransactionService {
 
     private final CurrencyTransactionRepository currencyTransactionRepository;
-    private final CurrencyRepository currencyRepository;
-
-    private final CurrencyTransactionMapper mapper;
+    private final CurrencyService currencyService;
 
     public void addTransaction(TransactionDto transactionDto) {
         CurrencyTransaction currencyTransaction = new CurrencyTransaction();
-        Currency sellCurrency = currencyRepository.findById(transactionDto.getSellCode()).get();
-        Currency buyCurrency = currencyRepository.findById(transactionDto.getBuyCode()).get();
+        //TODO exception
+        Currency sellCurrency = currencyService.getByCode(transactionDto.getSellCode()).get();
+        Currency buyCurrency = currencyService.getByCode(transactionDto.getBuyCode()).get();
         currencyTransaction.setSellCurrency(sellCurrency);
         currencyTransaction.setBuyCurrency(buyCurrency);
         currencyTransaction.setBoughtAmount(transactionDto.getBuyAmount());
@@ -35,25 +33,10 @@ public class CurrencyTransactionService {
         currencyTransactionRepository.save(currencyTransaction);
     }
 
-    public TransactionDto getLatestTransaction(){
-        CurrencyTransaction currencyTransaction = currencyTransactionRepository.getTopByOrderByDateDesc();
-        return mapper.toDto(currencyTransaction);
-    }
+    public Page<CurrencyTransaction> getAllFromGivenDates(LocalDate startDate, LocalDate endDate, int pageNum) {
+        return currencyTransactionRepository
+                .getAllBetweenDates(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX), PageRequest.of(pageNum - 1, 50));
 
-    public List<TransactionDto> getAllByDate(LocalDate date) {
-        List<CurrencyTransaction> currencyTransactions = currencyTransactionRepository
-                .getAllByDateYearAndDateMonthAndDateDay(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
-        return currencyTransactions.stream()
-                .map(mapper::toDto)
-                .toList();
-    }
-
-    public List<TransactionDto> getAllFromGivenDates(LocalDate startDate, LocalDate endDate) {
-        List<CurrencyTransaction> currencyTransactions =
-                currencyTransactionRepository.getAllBetweenDates(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX));
-        return currencyTransactions.stream()
-                .map(mapper::toDto)
-                .toList();
     }
 
 }

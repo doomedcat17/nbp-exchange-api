@@ -3,10 +3,11 @@ package com.doomedcat17.nbpexchangeapi.services;
 import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
 import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 import com.doomedcat17.nbpexchangeapi.repository.NbpExchangeRateRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,13 @@ import java.util.Optional;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExchangeRateService {
 
     private final NbpExchangeRateRepository nbpExchangeRateRepository;
 
-    private CurrencyService currencyService;
+    private final CurrencyService currencyService;
+    private int pageSize = 50;
 
     @Caching(evict = {
             @CacheEvict(cacheNames = {"allRecentRates", "ratesSize", "rateExchangeDto"}, allEntries = true),
@@ -41,8 +43,8 @@ public class ExchangeRateService {
         }
     }
 
-    public List<NbpExchangeRate> getAllByCurrencyCode(String currencyCode) {
-        return nbpExchangeRateRepository.getAllByCurrencyCode(currencyCode);
+    public Page<NbpExchangeRate> getAllByCurrencyCode(String currencyCode, int pageNum) {
+        return nbpExchangeRateRepository.getAllByCurrencyCode(currencyCode, PageRequest.of(pageNum - 1, pageSize));
     }
 
     public void removeAllOlderThanGivenDate(LocalDate date) {

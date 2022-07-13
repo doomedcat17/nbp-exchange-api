@@ -5,4 +5,5 @@ import org.zalando.problem.spring.web.advice.ProblemHandling;
 
 @RestControllerAdvice
 public class ExceptionHandler implements ProblemHandling {
+
 }

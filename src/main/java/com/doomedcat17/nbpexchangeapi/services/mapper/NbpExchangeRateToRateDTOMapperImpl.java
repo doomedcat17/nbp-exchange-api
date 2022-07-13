@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.services.mapper;
 
 import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.doomedcat17.nbpexchangeapi.data.dto.RateDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -13,8 +13,8 @@ import java.util.List;
 public class NbpExchangeRateToRateDTOMapperImpl implements NbpExchangeRateToRateDTOMapper {
 
     @Override
-    public List<RateDTO> mapToRates(List<NbpExchangeRate> exchangesRateToMap, NbpExchangeRate baseExchangeRate) {
-        List<RateDTO> rates = new ArrayList<>();
+    public List<RateDto> mapToRates(List<NbpExchangeRate> exchangesRateToMap, NbpExchangeRate baseExchangeRate) {
+        List<RateDto> rates = new ArrayList<>();
         exchangesRateToMap.forEach(nbpExchangeRate -> {
             if (!nbpExchangeRate.equals(baseExchangeRate)) {
                 rates.add(mapToRate(nbpExchangeRate, baseExchangeRate));
@@ -24,12 +24,12 @@ public class NbpExchangeRateToRateDTOMapperImpl implements NbpExchangeRateToRate
     }
 
     @Override
-    public RateDTO mapToRate(NbpExchangeRate exchangeRateToMap, NbpExchangeRate baseExchangeRate) {
+    public RateDto mapToRate(NbpExchangeRate exchangeRateToMap, NbpExchangeRate baseExchangeRate) {
         if (!exchangeRateToMap.getEffectiveDate().equals(baseExchangeRate.getEffectiveDate()))
             throw new IllegalArgumentException();
         BigDecimal rate = baseExchangeRate.getMidRateInPLN()
                 .divide(exchangeRateToMap.getMidRateInPLN(), RoundingMode.HALF_EVEN);
-        RateDTO rateDTO = new RateDTO();
+        RateDto rateDTO = new RateDto();
         rateDTO.setCode(exchangeRateToMap.getCurrency().getCode());
         rateDTO.setEffectiveDate(exchangeRateToMap.getEffectiveDate());
         rateDTO.setRate(rate);

@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.mapper;
 
 import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.doomedcat17.nbpexchangeapi.data.dto.RateDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -22,8 +22,14 @@ public interface NbpExchangeRateMapper {
     NbpExchangeRate fromJson(JsonNode jsonNode, LocalDate effectiveDate);
 
     @Mapping(target = "rate", source = "exchangeRateToMap", qualifiedByName = "rate")
-    @Mapping(target = "code", source = "exchangeRateToMap.currency.code")
-    RateDTO toRateDto(NbpExchangeRate exchangeRateToMap, @Context NbpExchangeRate baseExchangeRate);
+    @Mapping(target = "code", source = "exchangeRateToMap", qualifiedByName = "baseCode")
+    @Mapping(target = "targetCode", source = "exchangeRateToMap.currency.code")
+    RateDto toRateDto(NbpExchangeRate exchangeRateToMap, @Context NbpExchangeRate baseExchangeRate);
+
+    @Named("baseCode")
+    default String mapBaseCode(NbpExchangeRate exchangeRateToMap, @Context NbpExchangeRate baseExchangeRate) {
+        return baseExchangeRate.getCurrency().getCode();
+    }
 
     @Named("rate")
     default BigDecimal mapRate(NbpExchangeRate exchangeRateToMap, @Context NbpExchangeRate baseExchangeRate) {

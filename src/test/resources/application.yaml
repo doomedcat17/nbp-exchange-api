@@ -20,3 +20,4 @@ doomedcat17:
   nbp-exchange-api:
     initialization:
       enabled: false
+      scheduling: false

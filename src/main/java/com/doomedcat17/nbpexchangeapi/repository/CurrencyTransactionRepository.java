@@ -1,6 +1,8 @@
 package com.doomedcat17.nbpexchangeapi.repository;
 
 import com.doomedcat17.nbpexchangeapi.data.domain.CurrencyTransaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,8 +17,8 @@ public interface CurrencyTransactionRepository extends JpaRepository<CurrencyTra
     CurrencyTransaction getTopByOrderByDateDesc();
 
     @Query("SELECT transaction FROM CurrencyTransaction transaction WHERE YEAR(transaction.date) = :year AND MONTH(transaction.date) = :month AND DAY(transaction.date) = :day")
-    List<CurrencyTransaction> getAllByDateYearAndDateMonthAndDateDay(@Param("year") Integer year, @Param("month") Integer month, @Param("day") Integer day);
+    List<CurrencyTransaction> getAllByDateYearAndDateMonthAndDateDay(@Param("year") Integer year, @Param("month") Integer month, @Param("day") Integer day, Pageable pageable);
 
     @Query("SELECT transaction FROM CurrencyTransaction transaction WHERE transaction.date BETWEEN :startDate AND :endDate")
-    List<CurrencyTransaction> getAllBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    Page<CurrencyTransaction> getAllBetweenDates(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 }

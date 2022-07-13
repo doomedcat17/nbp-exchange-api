@@ -1,13 +1,14 @@
 package com.doomedcat17.nbpexchangeapi.services;
 
 import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
-import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.doomedcat17.nbpexchangeapi.data.dto.PageDto;
+import com.doomedcat17.nbpexchangeapi.data.dto.RateDto;
 import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
-import com.doomedcat17.nbpexchangeapi.services.mapper.NbpExchangeRateToRateDTOMapper;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,106 +16,98 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ExchangeRateDtoService {
 
     private final ExchangeRateService exchangeRateService;
-
-    private final NbpExchangeRateToRateDTOMapper nbpExchangeRateToRateDTOMapper;
-
     private final NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
 
-
     @Cacheable(cacheNames = "rateDtos", key = "#code")
-    public ExchangeRateDTO getRecentExchangeRatesForCode(String code) {
-        List<RateDTO> rates = getRecentRatesForCurrency(code);
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
-        exchangeRateDTO.setCode(code);
-        exchangeRateDTO.setRates(rates);
-        return exchangeRateDTO;
+    public PageDto<RateDto> getRecentExchangeRatesForCode(String code) {
+        PageDto<RateDto> pageDto = new PageDto<>();
+        pageDto.setPage(1);
+        pageDto.setTotalPages(1);
+        List<RateDto> rates = getRecentRatesForCurrency(code);
+        pageDto.setResults(rates);
+        pageDto.setTotalPages(1);
+        return pageDto;
     }
 
-    public ExchangeRateDTO getAllExchangeRatesForCodeAndDate(String currencyCode, LocalDate effectiveDate) {
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
-        exchangeRateDTO.setCode(currencyCode);
+    public PageDto<RateDto> getAllExchangeRatesForCodeAndDate(String currencyCode, LocalDate effectiveDate, int pageNum) {
+        PageDto<RateDto> pageDto = new PageDto();
         List<NbpExchangeRate> exchangeRates;
         if (Objects.isNull(effectiveDate)) {
-            exchangeRates = exchangeRateService.getAllByCurrencyCode(currencyCode);
+            Page<NbpExchangeRate> nbpExchangeRatePage = exchangeRateService.getAllByCurrencyCode(currencyCode, pageNum);
+            pageDto.setPage(pageNum);
+            pageDto.setTotalPages(nbpExchangeRatePage.getTotalPages());
+            exchangeRates = nbpExchangeRatePage.getContent();
         } else {
+            pageDto.setPage(1);
+            pageDto.setTotalPages(1);
             Optional<NbpExchangeRate> foundExchangeRate = exchangeRateService
                     .getByCurrencyCodeAndEffectiveDate(currencyCode, effectiveDate);
             exchangeRates = foundExchangeRate.map(List::of).orElseGet(List::of);
         }
 
 
-        if (exchangeRates.isEmpty()) return exchangeRateDTO;
-        List<RateDTO> rates = new ArrayList<>();
+        if (exchangeRates.isEmpty()) return pageDto;
+        List<RateDto> rates = new ArrayList<>();
         for (NbpExchangeRate baseExchangeRate : exchangeRates) {
             List<NbpExchangeRate> exchangeRatesToMap =
                     exchangeRateService.getAllByEffectiveDate(baseExchangeRate.getEffectiveDate());
-            rates.addAll(
-                    nbpExchangeRateToRateDTOMapper.mapToRates(exchangeRatesToMap, baseExchangeRate)
-            );
+            exchangeRatesToMap.stream().filter(nbpExchangeRate -> !nbpExchangeRate.getCurrency().getCode().equals(currencyCode))
+                    .forEach(nbpExchangeRate -> rates.add(mapper.toRateDto(nbpExchangeRate, baseExchangeRate)));
         }
-        exchangeRateDTO.setRates(rates);
-        return exchangeRateDTO;
+        pageDto.setResults(rates);
+        return pageDto;
     }
 
     @Cacheable(cacheNames = "rateExchangeDto", key = "#sourceCurrencyCode.concat(#targetCurrencyCode)")
-    public ExchangeRateDTO getRecentExchangeRate(String sourceCurrencyCode, String targetCurrencyCode) {
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
-        exchangeRateDTO.setCode(sourceCurrencyCode);
-        if (sourceCurrencyCode.equals(targetCurrencyCode)) return exchangeRateDTO;
+    public PageDto<RateDto> getRecentExchangeRate(String sourceCurrencyCode, String targetCurrencyCode) {
+        PageDto<RateDto> pageDto = new PageDto();
+        pageDto.setPage(1);
+        pageDto.setTotalPages(0);
+        List<RateDto> rateDtos = new ArrayList<>();
+        pageDto.setResults(rateDtos);
         Optional<NbpExchangeRate> sourceExchangeRate =
                 exchangeRateService.getMostRecentByCurrencyCode(sourceCurrencyCode);
-        if (sourceExchangeRate.isEmpty()) return exchangeRateDTO;
+        if (sourceExchangeRate.isEmpty()) return pageDto;
         Optional<NbpExchangeRate> targetExchangeRate =
                 exchangeRateService.getMostRecentByCurrencyCode(targetCurrencyCode);
-        if (targetExchangeRate.isEmpty()) return exchangeRateDTO;
+        if (targetExchangeRate.isEmpty()) return pageDto;
         getRecentRate(sourceExchangeRate.get(), targetExchangeRate.get()).ifPresent(
-                        rateDTO -> exchangeRateDTO.setRates(List.of(rateDTO)));
-        return exchangeRateDTO;
+                rateDtos::add);
+        pageDto.setTotalPages(1);
+        return pageDto;
     }
 
-    public ExchangeRateDTO getExchangeRateForCodeAndDate(String sourceCurrencyCode, String targetCurrencyCode, LocalDate effectiveDate) {
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
-        exchangeRateDTO.setCode(sourceCurrencyCode);
-        if (sourceCurrencyCode.equals(targetCurrencyCode)) return exchangeRateDTO;
-
-        Optional<NbpExchangeRate> sourceExchangeRate =
-                exchangeRateService.getByCurrencyCodeAndEffectiveDate(sourceCurrencyCode, effectiveDate);
-        Optional<NbpExchangeRate> targetExchangeRate =
-                exchangeRateService.getByCurrencyCodeAndEffectiveDate(targetCurrencyCode, effectiveDate);
-        if (sourceExchangeRate.isEmpty() || targetExchangeRate.isEmpty()) return exchangeRateDTO;
-
-        List<RateDTO> rates = List.of(
-                nbpExchangeRateToRateDTOMapper.mapToRate(targetExchangeRate.get(), sourceExchangeRate.get()));
-        exchangeRateDTO.setRates(rates);
-        return exchangeRateDTO;
-    }
-
-    public ExchangeRateDTO getExchangeRatesForCodes(String sourceCurrencyCode, String targetCurrencyCode) {
-        ExchangeRateDTO exchangeRateDTO = new ExchangeRateDTO();
-        exchangeRateDTO.setCode(sourceCurrencyCode);
-        if (sourceCurrencyCode.equals(targetCurrencyCode)) return exchangeRateDTO;
-        List<NbpExchangeRate> sourceExchangeRates = exchangeRateService.getAllByCurrencyCode(sourceCurrencyCode);
-        if (sourceExchangeRates.isEmpty()) return exchangeRateDTO;
-
-        List<RateDTO> targetRates = new ArrayList<>();
-        for (NbpExchangeRate sourceExchangeRate : sourceExchangeRates) {
-            Optional<NbpExchangeRate> targetExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(
-                    targetCurrencyCode, sourceExchangeRate.getEffectiveDate()
-            );
-            if (targetExchangeRate.isEmpty()) continue;
-            targetRates.add(nbpExchangeRateToRateDTOMapper.mapToRate(targetExchangeRate.get(), sourceExchangeRate));
+    public PageDto<RateDto> getExchangeRatesForCodes(String sourceCurrencyCode, String targetCurrencyCode, LocalDate effectiveDate, int pageNum) {
+        PageDto<RateDto> pageDto = new PageDto<>();
+        pageDto.setPage(pageNum);
+        List<RateDto> targetRates = new ArrayList<>();
+        pageDto.setResults(targetRates);
+        if (Objects.nonNull(effectiveDate)) {
+            NbpExchangeRate sourceExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(sourceCurrencyCode, effectiveDate).get();
+            NbpExchangeRate targetExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(targetCurrencyCode, effectiveDate).get();
+            targetRates.add(mapper.toRateDto(targetExchangeRate, sourceExchangeRate));
+        } else {
+            Page<NbpExchangeRate> sourceExchangeRates = exchangeRateService.getAllByCurrencyCode(sourceCurrencyCode, pageNum);
+            pageDto.setTotalPages(sourceExchangeRates.getTotalPages());
+            if (sourceExchangeRates.isEmpty()) return pageDto;
+            for (NbpExchangeRate sourceExchangeRate : sourceExchangeRates) {
+                Optional<NbpExchangeRate> targetExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(
+                        targetCurrencyCode, sourceExchangeRate.getEffectiveDate()
+                );
+                if (targetExchangeRate.isEmpty()) continue;
+                targetRates.add(mapper.toRateDto(targetExchangeRate.get(), sourceExchangeRate));
+            }
         }
-        if (targetRates.isEmpty()) return exchangeRateDTO;
-        exchangeRateDTO.setRates(targetRates);
-        return exchangeRateDTO;
+        pageDto.setResults(targetRates);
+        return pageDto;
     }
 
-    private List<RateDTO> getRecentRatesForCurrency(String sourceCurrencyCode) {
-        List<RateDTO> rateDTOS = new ArrayList<>();
+    private List<RateDto> getRecentRatesForCurrency(String sourceCurrencyCode) {
+        List<RateDto> rateDtos = new ArrayList<>();
         Optional<NbpExchangeRate> foundSourceExchangeRate = exchangeRateService.getMostRecentByCurrencyCode(sourceCurrencyCode);
         if (foundSourceExchangeRate.isEmpty()) return List.of();
         List<NbpExchangeRate> recentExchangeRates = exchangeRateService
@@ -123,15 +116,15 @@ public class ExchangeRateDtoService {
         NbpExchangeRate sourceExchangeRate = foundSourceExchangeRate.get();
         for (NbpExchangeRate recentExchangeRate : recentExchangeRates) {
             if (!recentExchangeRate.equals(sourceExchangeRate)) {
-                Optional<RateDTO> foundRecentRate = getRecentRate(sourceExchangeRate, recentExchangeRate);
-                foundRecentRate.ifPresent(rateDTOS::add);
+                Optional<RateDto> foundRecentRate = getRecentRate(sourceExchangeRate, recentExchangeRate);
+                foundRecentRate.ifPresent(rateDtos::add);
             }
         }
-        return rateDTOS;
+        return rateDtos;
     }
 
 
-    protected Optional<RateDTO> getRecentRate(NbpExchangeRate baseExchangeRate, NbpExchangeRate targetExchangeRate) {
+    protected Optional<RateDto> getRecentRate(NbpExchangeRate baseExchangeRate, NbpExchangeRate targetExchangeRate) {
         if (!baseExchangeRate.getEffectiveDate().equals(targetExchangeRate.getEffectiveDate())) {
             Optional<NbpExchangeRate> foundSourceExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(
                     baseExchangeRate.getCurrency().getCode(),
