@@ -1,6 +1,22 @@
 version: '3.8'
 services:
-  nbp-exchange-api-db:
+  web:
+    build:
+      context: .
+    container_name: nbp-exchange-api
+    ports:
+      - "80:8080"
+    environment:
+      - DB_USER=root
+      - DB_PASSWORD=rootpass
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=exchangeDb
+    depends_on:
+      - db
+    networks:
+      - main
+  db:
     image: mysql
     ports:
       - "3306:3306"
@@ -9,5 +25,9 @@ services:
       MYSQL_DATABASE: exchangeDb
     volumes:
       - nbpExchangeDb:/mysql/
+    networks:
+      - main
 volumes:
   nbpExchangeDb:
+networks:
+  main:
