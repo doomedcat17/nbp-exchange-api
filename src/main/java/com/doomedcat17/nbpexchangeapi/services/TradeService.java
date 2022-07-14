@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -18,11 +19,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class TradeService {
 
     private final ExchangeRateDtoService exchangeRateService;
-    private final CurrencyTransactionService transactionRepository;
+    private final CurrencyTransactionService transactionService;
     private final CurrencyTransactionMapper mapper;
 
 
@@ -38,7 +40,7 @@ public class TradeService {
         transaction.setSellAmount(soldAmount);
         transaction.setBuyAmount(buyAmount);
         transaction.setDate(LocalDateTime.now());
-        transactionRepository.addTransaction(transaction);
+        transactionService.addTransaction(transaction);
         return transaction;
     }
 
@@ -46,9 +48,9 @@ public class TradeService {
         PageDto<TransactionDto> pageDto = new PageDto<>();
         List<TransactionDto> transactionDtos = new ArrayList<>();
         pageDto.setResults(transactionDtos);
-        if (Objects.isNull(startDate)) startDate = LocalDate.MIN;
-        if (Objects.isNull(endDate)) endDate = LocalDate.MAX;
-        Page<CurrencyTransaction> currencyTransactions = transactionRepository.getAllFromGivenDates(startDate, endDate, pageNumber);
+        if (Objects.isNull(startDate)) startDate = LocalDate.of(1970, 1, 1);
+        if (Objects.isNull(endDate)) endDate = LocalDate.of(2038, 12, 30);
+        Page<CurrencyTransaction> currencyTransactions = transactionService.getAllFromGivenDates(startDate, endDate, pageNumber);
         pageDto.setPage(pageNumber);
         pageDto.setTotalPages(currencyTransactions.getTotalPages());
         currencyTransactions.getContent().forEach(currencyTransaction -> transactionDtos.add(mapper.toDto(currencyTransaction)));
