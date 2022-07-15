@@ -10,7 +10,6 @@ spring:
   cache:
     type: simple
   jpa:
-    show-sql: true
     generate-ddl: false
     hibernate:
       ddl-auto: none

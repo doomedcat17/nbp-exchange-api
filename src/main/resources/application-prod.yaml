@@ -1,0 +1,4 @@
+doomedcat17:
+  nbp-exchange-api:
+    rates-ttl-in-workdays: 180
+    transactions-ttl-in-workdays: 30
