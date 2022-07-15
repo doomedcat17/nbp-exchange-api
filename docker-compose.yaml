@@ -17,7 +17,8 @@ services:
     networks:
       - main
   db:
-    image: mysql
+    image: mysql:8.0.29-debian
+    container_name: nbp-exchange-db
     ports:
       - "3306:3306"
     environment:

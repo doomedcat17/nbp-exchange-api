@@ -1,69 +1,90 @@
 # NBP Exchange Api
 
-Prosta RESTowa aplikacja do pobierania danych o kursie walut bezpośrednio z [NBP](http://api.nbp.pl/).
+A simple REST application to retrieve exchange rate data directly from the [NBP](http://api.nbp.pl/) API.
 
-- [Opis](#opis)
-- [Uruchamianie](#uruchamianie)
+- [Description](#description)
+- [Setup](#setup)
 - [Dokumentacja](#dokumentacja)
-  - [Inicjalizacja](#inicjalizacja)
-  - [Endpointy](#endpointy)
-    - [Pobieranie kursów](#pobieranie-kursów)
-    - [Wymiana walut](#wymiana-walut)
-    - [Historia wymiany walut](#historia-wymiany-walut)
+  - [Initialization](#inicjalizacja)
+  - [Endpoints](#endpointy)
+    - [Getting rates](#pobieranie-kursów)
+    - [Rate exchange](#wymiana-walut)
+    - [Transaction Histort](#historia-wymiany-walut)
     - [Komunikaty błędów](#komunikaty-błędów)
 - [Stack](#stack)
 
 **Aplikacja jest dostępna na [Heroku](https://nbp-exchange-api.herokuapp.com/api/rates/pln/recent)! (działa na darmowym hostingu MySQL, więc prędkość nie powala :P)**
 
-# Opis
-Aplikacja bazuje na NBP API, a konkretnie na tablach A oraz B, więc *de facto* korzysta z kursów uśrednionych.
-Zależało, aby były dostępne kursy wszystkich walut. Kursy są przechowywane do siedmiu dni roboczych i są aktualizowane w każdy dzień roboczy o godzinie 12:31.
-Wynika to z tego, że mniej więcej o tej godzinie NBP aktualizuje swoją bazę danych.
+# Description
+The app is based on the NBP API, specifically Tables A and B, so *de facto* uses averaged rates.
+It allows conversion of currency conversions and the addition and review of transactions.
+The updates occur Monday to Friday at 12:31 p.m. This is because the NBP updates its data at around this time.
+# Setup
 
-# Uruchamianie
+Make sure you have [git](https://git-scm.com/) installed.
+The application uses Postgres as the database by default.
+It is required to provide database connection URL and database user conditionals for an application to run.  
+**If you do not want to play around with the database configuration you can use the 'H2' profile. Explained below**
 
-**Wymagania:** Java 17, Maven, MySQL
+### Maven
 
-Skorzystaj z gita, aby sklonować repozytorium na dysk:
+**Java 17 is required for this step**  
+Clone repository and enter its folder:
 
 ```
 git clone https://github.com/doomedcat17/nbp-exchange-api.git
-```
-
-A następnie przejdź do folderu z aplikacją:
-
-```
 cd nbp-exchange-api
 ```
 
-Do uruchomienia wymagana jest baza MySQL. 
+And you can run the app using spring-boot maven plugin providing your postgres url and conditionals:
+
+```
+./mvnw spring-boot:run -Dspring-boot.run.arguments="--spring.datasource.url=databaseURLHere --spring.datasource.username=databaseUserHere,--spring.datasource.password=databaseUserPasswordHere"
+```
+
+Or you can use H2 profile instead:
+
+```
+./mvnw spring-boot:run -Dspring-boot.run.profiles=h2
+```
+It will use H2 database in-memory mode, so none of data will be persisted.
 
 ### Docker
-Jeśli masz zainstalowanego Dockera, możesz wykorzystać `docker-compose.yaml`
-do szybkiego postawienia kontenera z MySQL. 
 
-W tym celu wykonaj komendę w terminalu:
+Clone repository and enter its folder:
 
 ```
-docker-compose up -d
+git clone https://github.com/doomedcat17/nbp-exchange-api.git
+cd nbp-exchange-api
 ```
-Teraz wystarczy, że wykonasz poniższą komendę:
-```
-mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://root:rootpass@localhost:3306/exchangeDb
-```
-### Co jeśli mam już MySQL?
 
-Jeżeli posiadasz już jakąś instancję bazy, możesz ją wykorzystać podając podmieniając URL w poniższej komendzie:
+And build Docker Image and run the container providing database conditionals via environment variables:
+
 ```
-mvn spring-boot:run -Dspring-boot.run.arguments=--spring.datasource.url={TU URL POŁĄCZENIA}
+docker build -t gpu-price-api:1.0 . 
+docker run -d -p 8080:8080 \
+-e DB_USER='db_user' \
+-e DB_PASSWORD='superStrongPassword' \
+-e DB_HOST='db_host' \
+-e DB_PORT='3306' \
+-e DB_NAME='db_name' \
+--name gpu-price-api \
+gpu-price-api:1.0
 ```
-**Upewnij się, że URL bazy zaczyna się od `jdbc:mysql:`.**
 
-Aplikacja powinna już być gotowa do użycia.
+Alternatively you can use docker compose to easily setup application container and MySQL database:
 
-# Dokumentacja
+```
+docker compose -f docker-compose-dev.yaml up -d
+```
 
-## Inicjalizacja
+It will create MySQL database container and the app itself.
+It will run on port 80, so make sure it is available.
+
+
+# Docs
+
+## Initialization
 
 Kiedy uruchomimy aplikację rozpocznie się proces inicjalizacji. Aplikacja utworzy strukturę bazy danych oraz 
 pobierze dane o kursach z **ostatnich siedmiu dni roboczych. Z dzisiaj włącznie.** 

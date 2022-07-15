@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.doomedcat17</groupId>
     <artifactId>nbp-exchange-api</artifactId>
-    <version>0.7</version>
+    <version>1.0</version>
     <name>nbp-exchange-api</name>
     <description>nbp-exchange-api</description>
     <properties>
@@ -78,7 +78,7 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
