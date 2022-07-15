@@ -24,7 +24,6 @@ public class CurrencyTransactionService {
 
     public void addTransaction(TransactionDto transactionDto) {
         CurrencyTransaction currencyTransaction = new CurrencyTransaction();
-        //TODO exception
         Currency sellCurrency = currencyService.getByCode(transactionDto.getSellCode()).get();
         Currency buyCurrency = currencyService.getByCode(transactionDto.getBuyCode()).get();
         currencyTransaction.setSellCurrency(sellCurrency);
@@ -38,7 +37,10 @@ public class CurrencyTransactionService {
     public Page<CurrencyTransaction> getAllFromGivenDates(LocalDate startDate, LocalDate endDate, int pageNum) {
         return currencyTransactionRepository
                 .getAllBetweenDates(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX), PageRequest.of(pageNum - 1, 50));
+    }
 
+    public void removeAllOlderThanGivenDate(LocalDate date) {
+        currencyTransactionRepository.deleteAllByDateBefore(LocalDateTime.of(date, LocalTime.MIN));
     }
 
 }

@@ -1,10 +1,10 @@
 package com.doomedcat17.nbpexchangeapi.update;
 
 import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.services.CurrencyTransactionService;
 import com.doomedcat17.nbpexchangeapi.services.ExchangeRateService;
 import com.doomedcat17.nbpexchangeapi.services.StartWorkDateProvider;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.NbpRatesProvider;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +20,7 @@ public class RatesUpdater {
 
     private final ExchangeRateService rateService;
     private final NbpRatesProvider nbpRatesProvider;
+    private final CurrencyTransactionService currencyTransactionService;
 
     private final StartWorkDateProvider startWorkDateProvider;
 
@@ -28,6 +29,9 @@ public class RatesUpdater {
 
     @Value("${doomedcat17.nbp-exchange-api.rates-ttl-in-workdays:0}")
     private int ratesTTLInWorkdays;
+
+    @Value("${doomedcat17.nbp-exchange-api.transactions-ttl-in-workdays:0}")
+    private int transactionsTTLInWorkdays;
 
 
     public void update() {
@@ -50,10 +54,14 @@ public class RatesUpdater {
             log.info("Update success!");
         }
         if (ratesTTLInWorkdays > 0) {
-            LocalDate startDate = startWorkDateProvider.get(LocalDate.now(), ratesTTLInWorkdays);
-            log.info("Removing rates older than "+startDate);
-            rateService.removeAllOlderThanGivenDate(startDate);
-            log.info("Removal success!");
+            LocalDate ratesStartDate = startWorkDateProvider.get(LocalDate.now(), ratesTTLInWorkdays);
+            log.info("Removing rates older than "+ratesStartDate);
+            rateService.removeAllOlderThanGivenDate(ratesStartDate);
+        }
+        if (transactionsTTLInWorkdays > 0) {
+            LocalDate transactionsStartDate = startWorkDateProvider.get(LocalDate.now(), transactionsTTLInWorkdays);
+            log.info("Removing transactions older than "+transactionsStartDate);
+            currencyTransactionService.removeAllOlderThanGivenDate(transactionsStartDate);
         }
     }
 }
