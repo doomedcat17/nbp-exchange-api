@@ -18,14 +18,14 @@ public class CurrencyTransaction {
     private long id;
     private LocalDateTime date;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne
     @JoinColumn(name="sell_currency", nullable=false)
     private Currency sellCurrency;
 
     @Column(name = "sold_amount",scale = 2, precision = 20)
     private BigDecimal soldAmount;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne
     @JoinColumn(name="buy_currency", nullable=false)
     private Currency buyCurrency;
 

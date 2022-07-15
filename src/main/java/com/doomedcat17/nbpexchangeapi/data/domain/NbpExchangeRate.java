@@ -3,6 +3,7 @@ package com.doomedcat17.nbpexchangeapi.data.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public class NbpExchangeRate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="currency_code", nullable=false)
     private Currency currency;
 
