@@ -148,18 +148,18 @@ public class ExchangeRateDtoService {
         int counter = 0;
         long skipNum = (pageDto.getPage()-1)*pageSize;
         for (NbpExchangeRate baseExchangeRate : baseNbpRates) {
-            List<NbpExchangeRate> exchangeRatesToMap;
-            exchangeRatesToMap = targetCurrencyCode.map(s -> List.of(exchangeRateService
-                            .getByCurrencyCodeAndEffectiveDate(
-                                    s, baseExchangeRate.getEffectiveDate()).get()))
-                    .orElseGet(() -> exchangeRateService.getAllByEffectiveDate(baseExchangeRate.getEffectiveDate()));
-            if (targetCurrencyCode.isPresent())
+            List<NbpExchangeRate> exchangeRatesToMap = new ArrayList<>();
+            if (targetCurrencyCode.isPresent()) {
+                Optional<NbpExchangeRate> foundNbpExchangeRate = exchangeRateService
+                        .getByCurrencyCodeAndEffectiveDate(targetCurrencyCode.get(), baseExchangeRate.getEffectiveDate());
+                foundNbpExchangeRate.ifPresent(exchangeRatesToMap::add);
                 totalCounter += exchangeRateService.getSizeByCodeAndEffectiveDate(targetCurrencyCode.get(), baseExchangeRate.getEffectiveDate());
-            else totalCounter += exchangeRateService.getSizeByEffectiveDate(baseExchangeRate.getEffectiveDate());
+            } else {
+                exchangeRatesToMap.addAll(exchangeRateService.getAllByEffectiveDate(baseExchangeRate.getEffectiveDate()));
+                totalCounter += exchangeRateService.getSizeByEffectiveDate(baseExchangeRate.getEffectiveDate());
+            }
             List<RateDto> currentRates = exchangeRatesToMap.stream().filter(nbpExchangeRate -> !nbpExchangeRate.getCurrency().getCode().equals(baseCode))
                     .map(nbpExchangeRate -> mapper.toRateDto(nbpExchangeRate, baseExchangeRate)).toList();
-
-
             if (currentRates.size() <= skipNum) {
                 skipNum -= exchangeRatesToMap.size();
             } else {
