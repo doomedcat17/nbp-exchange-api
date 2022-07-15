@@ -1,7 +1,9 @@
 package com.doomedcat17.nbpexchangeapi.controllers;
 
-import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
-import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.doomedcat17.nbpexchangeapi.data.dto.PageDto;
+import com.doomedcat17.nbpexchangeapi.data.dto.RateDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -13,12 +15,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -42,22 +46,22 @@ class RatesControllerTest {
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/rates/{currencyCode}/recent", currencyCode))
+                .perform(get("/api/rates/recent").param("currency", currencyCode))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
+        PageDto<RateDto> pageDto = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<PageDto<RateDto>>() {
+        });
         //then
-        ExchangeRateDTO exchangeRateDTO = objectMapper.readValue(result.getResponse().getContentAsString(),
-                ExchangeRateDTO.class);
 
-        assertEquals(currencyCode, exchangeRateDTO.getCode());
-        List<RateDTO> rates = exchangeRateDTO.getRates();
+        List<RateDto> rates = pageDto.getResults();
 
+        assertTrue(rates.stream().allMatch(rateDto -> rateDto.getCode().equals(currencyCode)));
         assertEquals(4, rates.size());
         assertTrue(rates.stream().allMatch(
                 rateDTO ->
                         rateDTO.getEffectiveDate().equals(LocalDate.parse("2021-11-30"))
-                                || (rateDTO.getEffectiveDate().equals(LocalDate.parse("2021-11-25")) && rateDTO.getCode().equals("AFN"))));
-        assertTrue(rates.stream().noneMatch(rate -> rate.getCode().equals("USD")));
+                                || (rateDTO.getEffectiveDate().equals(LocalDate.parse("2021-11-25")) && rateDTO.getTargetCode().equals("AFN"))));
+        assertTrue(rates.stream().noneMatch(rate -> rate.getTargetCode().equals("USD")));
     }
 
 
@@ -69,11 +73,12 @@ class RatesControllerTest {
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/rates/{currencyCode}/recent", currencyCode))
+                .perform(get("/api/rates/recent").param("currency", currencyCode))
                 .andExpect(result1 -> status().isNotFound()).andReturn();
 
         //then
-        assertTrue(result.getResponse().getContentAsString().isEmpty());
+        JsonNode arrayNode = objectMapper.readTree(result.getResponse().getContentAsString()).get("results");
+        assertTrue(arrayNode.isEmpty());
     }
 
     @SneakyThrows
@@ -85,11 +90,12 @@ class RatesControllerTest {
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/rates/{currencyCode}/all", currencyCode))
+                .perform(get("/api/rates").param("currency", currencyCode))
                 .andExpect(result1 -> status().isNotFound()).andReturn();
 
         //then
-        assertTrue(result.getResponse().getContentAsString().isEmpty());
+        JsonNode arrayNode = objectMapper.readTree(result.getResponse().getContentAsString()).get("results");
+        assertTrue(arrayNode.isEmpty());
     }
 
     @SneakyThrows
@@ -100,18 +106,18 @@ class RatesControllerTest {
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/rates/{currencyCode}/all", currencyCode))
+                .perform(get("/api/rates").param("currency", currencyCode))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
         //then
-        ExchangeRateDTO exchangeRateDTO = objectMapper.readValue(result.getResponse().getContentAsString(),
-                ExchangeRateDTO.class);
+        PageDto<RateDto> pageDto = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<PageDto<RateDto>>() {
+        });
 
-        assertEquals(currencyCode, exchangeRateDTO.getCode());
-        List<RateDTO> rates = exchangeRateDTO.getRates();
+        List<RateDto> rates = pageDto.getResults();
 
         assertEquals(26, rates.size());
-        assertTrue(rates.stream().noneMatch(rate -> rate.getCode().equals("USD")));
+        assertTrue(rates.stream().allMatch(rate -> rate.getCode().equals("USD")));
+        assertTrue(rates.stream().noneMatch(rate -> rate.getTargetCode().equals("USD")));
     }
 
     @SneakyThrows
@@ -124,21 +130,23 @@ class RatesControllerTest {
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/recent",
-                        sourceCurrencyCode, targetCurrencyCode))
+                .perform(get("/api/rates/recent",
+                        sourceCurrencyCode, targetCurrencyCode)
+                        .param("currency", sourceCurrencyCode)
+                        .param("targetCurrency", targetCurrencyCode))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
         //then
-        ExchangeRateDTO exchangeRateDTO = objectMapper.readValue(result.getResponse().getContentAsString(),
-                ExchangeRateDTO.class);
+        PageDto<RateDto> pageDto = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<PageDto<RateDto>>() {
+        });
 
-        assertEquals(sourceCurrencyCode, exchangeRateDTO.getCode());
-        List<RateDTO> rates = exchangeRateDTO.getRates();
+        assertTrue(pageDto.getResults().stream().noneMatch(rate -> rate.getTargetCode().equals(sourceCurrencyCode)));
+        List<RateDto> rates = pageDto.getResults();
 
         assertEquals(1, rates.size());
 
-        RateDTO rateDTO = rates.get(0);
-        assertEquals("PLN", rateDTO.getCode());
+        RateDto rateDTO = rates.get(0);
+        assertEquals(targetCurrencyCode, rateDTO.getTargetCode());
         assertEquals(LocalDate.parse("2021-11-30"), rateDTO.getEffectiveDate());
     }
 
@@ -152,20 +160,21 @@ class RatesControllerTest {
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/all",
-                        sourceCurrencyCode, targetCurrencyCode))
+                .perform(get("/api/rates",
+                        sourceCurrencyCode, targetCurrencyCode)
+                        .param("currency", sourceCurrencyCode)
+                        .param("targetCurrency", targetCurrencyCode))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
         //then
-        ExchangeRateDTO exchangeRateDTO = objectMapper.readValue(result.getResponse().getContentAsString(),
-                ExchangeRateDTO.class);
+        PageDto<RateDto> pageDto = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<PageDto<RateDto>>() {
+        });
 
-        assertEquals(sourceCurrencyCode, exchangeRateDTO.getCode());
-        List<RateDTO> rates = exchangeRateDTO.getRates();
+        assertTrue(pageDto.getResults().stream().noneMatch(rate -> rate.getTargetCode().equals(sourceCurrencyCode)));
+        List<RateDto> rates = pageDto.getResults();
 
         assertEquals(8, rates.size());
-
-        assertTrue(rates.stream().allMatch(rateDTO -> rateDTO.getCode().equals(targetCurrencyCode)));
+        assertTrue(rates.stream().allMatch(rateDTO -> rateDTO.getTargetCode().equals(targetCurrencyCode)));
     }
 
     @SneakyThrows
@@ -180,76 +189,23 @@ class RatesControllerTest {
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/{date}",
-                        sourceCurrencyCode, targetCurrencyCode, date))
+                .perform(get("/api/rates",
+                        sourceCurrencyCode, targetCurrencyCode)
+                        .param("currency", sourceCurrencyCode)
+                        .param("targetCurrency", targetCurrencyCode)
+                        .param("effectiveDate", date.toString()))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
         //then
-        ExchangeRateDTO exchangeRateDTO = objectMapper.readValue(result.getResponse().getContentAsString(),
-                ExchangeRateDTO.class);
+        PageDto<RateDto> pageDto = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<PageDto<RateDto>>() {
+        });
 
-        assertEquals(sourceCurrencyCode, exchangeRateDTO.getCode());
-        List<RateDTO> rates = exchangeRateDTO.getRates();
+        assertTrue(pageDto.getResults().stream().noneMatch(rate -> rate.getTargetCode().equals(sourceCurrencyCode)));
+        List<RateDto> rates = pageDto.getResults();
 
         assertEquals(1, rates.size());
 
-        RateDTO rateDTO = rates.get(0);
-        assertEquals("PLN", rateDTO.getCode());
-        assertEquals(date, rateDTO.getEffectiveDate());
-    }
-
-
-    @SneakyThrows
-    @Test
-    void shouldNOTReturnRecentExchangeRatesForGivenCodes() {
-        //given
-        String sourceCurrencyCode = "XDD";
-
-        String targetCurrencyCode = "CO";
-
-        //when
-        MvcResult result1 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/recent",
-                        sourceCurrencyCode, targetCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result2 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/recent",
-                        sourceCurrencyCode, sourceCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result3 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/2021-11-30",
-                        sourceCurrencyCode, targetCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result4 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/2021-11-30",
-                        sourceCurrencyCode, sourceCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result5 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/all",
-                        sourceCurrencyCode, targetCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        MvcResult result6 = mockMvc
-                .perform(get("/api/rates/{sourceCurrencyCode}/{targetCurrencyCode}/all",
-                        sourceCurrencyCode, sourceCurrencyCode))
-                .andExpect(result -> status().isNotFound()).andReturn();
-
-        //then
-        assertTrue(result1.getResponse().getContentAsString().isEmpty());
-        assertTrue(result2.getResponse().getContentAsString().isEmpty());
-        assertTrue(result3.getResponse().getContentAsString().isEmpty());
-        assertTrue(result4.getResponse().getContentAsString().isEmpty());
-        assertTrue(result5.getResponse().getContentAsString().isEmpty());
-        assertTrue(result6.getResponse().getContentAsString().isEmpty());
-    }
-
-
-    public RatesControllerTest() {
-        this.objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
+        assertTrue(rates.stream().allMatch(rateDTO -> rateDTO.getTargetCode().equals(targetCurrencyCode)));
+        assertTrue(rates.stream().allMatch(rateDto -> rateDto.getEffectiveDate().equals(date)));
     }
 }

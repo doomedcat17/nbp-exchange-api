@@ -1,10 +1,11 @@
 package com.doomedcat17.nbpexchangeapi.data.nbp.provider;
 
 import com.doomedcat17.nbpexchangeapi.TestDataProvider;
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.DefaultNbpRatesProvider;
 import com.doomedcat17.nbpexchangeapi.services.nbp.provider.table.DefaultNbpTableProvider;
-import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
+import com.doomedcat17.nbpexchangeapi.services.StartWorkDateProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
@@ -28,7 +30,10 @@ class DefaultNbpRatesProviderTest {
     private DefaultNbpTableProvider tableProvider;
 
     @Mock
-    private WorkWeekStartDateProvider workWeekStartDateProvider;
+    private StartWorkDateProvider startWorkDateProvider;
+
+    @Spy
+    NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
 
     @InjectMocks
     private DefaultNbpRatesProvider npbCurrencyProvider;
@@ -38,7 +43,7 @@ class DefaultNbpRatesProviderTest {
     @Test
     void shouldProvideAllExchangeRatesFromLastWorkWeek() throws IOException {
         //given
-        Mockito.when(workWeekStartDateProvider.get(LocalDate.parse("2021-11-26")))
+        Mockito.when(startWorkDateProvider.get(LocalDate.parse("2021-11-26"), 7))
                 .thenReturn(LocalDate.parse("2021-11-18"));
 
         String tablesAJson = TestDataProvider.jsonStringFromFile("src/test/resources/nbp_tables_a_2021-11-18_2021-11-26.json");

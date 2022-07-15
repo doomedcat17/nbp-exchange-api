@@ -1,38 +1,38 @@
 package com.doomedcat17.nbpexchangeapi.services;
 
-import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
-import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.doomedcat17.nbpexchangeapi.data.domain.CurrencyTransaction;
+import com.doomedcat17.nbpexchangeapi.data.dto.PageDto;
+import com.doomedcat17.nbpexchangeapi.data.dto.RateDto;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
+import com.doomedcat17.nbpexchangeapi.mapper.CurrencyTransactionMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class TradeService {
 
-    private final ExchangeRatesService exchangeRatesService;
+    private final ExchangeRateDtoService exchangeRateService;
+    private final CurrencyTransactionService transactionService;
+    private final CurrencyTransactionMapper mapper;
 
-    private final CurrencyTransactionRepository transactionRepository;
 
-    public TradeService(ExchangeRatesService exchangeRatesService, CurrencyTransactionRepository transactionRepository) {
-        this.exchangeRatesService = exchangeRatesService;
-        this.transactionRepository = transactionRepository;
-    }
-
-    public Optional<TransactionDto> buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
+    public TransactionDto buyCurrency(String buyCurrencyCode, String sellCurrencyCode, BigDecimal buyAmount) {
         buyAmount = buyAmount.setScale(2, RoundingMode.HALF_EVEN);
         TransactionDto transaction = new TransactionDto();
-        Optional<ExchangeRateDTO> foundExchangeRateDTO = exchangeRatesService
-                .getRecentExchangeRate(buyCurrencyCode, sellCurrencyCode);
-        if (foundExchangeRateDTO.isEmpty()) return Optional.empty();
-        RateDTO rate = foundExchangeRateDTO.get()
-                .getRates().get(0);
+        RateDto rate = exchangeRateService
+                .getRecentExchangeRate(buyCurrencyCode, sellCurrencyCode).getResults().get(0);
         BigDecimal soldAmount = rate.getRate().multiply(buyAmount);
         soldAmount = soldAmount.setScale(2, RoundingMode.HALF_EVEN);
         transaction.setBuyCode(buyCurrencyCode);
@@ -40,18 +40,20 @@ public class TradeService {
         transaction.setSellAmount(soldAmount);
         transaction.setBuyAmount(buyAmount);
         transaction.setDate(LocalDateTime.now());
-        transactionRepository.addTransaction(transaction);
-        return Optional.of(transaction);
+        transactionService.addTransaction(transaction);
+        return transaction;
     }
 
-    public List<TransactionDto> getTransactionsFromGivenDate(String date) {
-        LocalDate transactionDate = LocalDate.parse(date);
-        return transactionRepository.getAllByDate(transactionDate);
-    }
-
-    public List<TransactionDto> getTransactionsFromGivenDates(String startDate, String endDate) {
-        LocalDate transactionStartDate = LocalDate.parse(startDate);
-        LocalDate transactionEndDate= LocalDate.parse(endDate);
-        return transactionRepository.getAllFromGivenDates(transactionStartDate, transactionEndDate);
+    public PageDto<TransactionDto> getTransactionsFromGivenDates(LocalDate startDate, LocalDate endDate, int pageNumber) {
+        PageDto<TransactionDto> pageDto = new PageDto<>();
+        List<TransactionDto> transactionDtos = new ArrayList<>();
+        pageDto.setResults(transactionDtos);
+        if (Objects.isNull(startDate)) startDate = LocalDate.of(1970, 1, 1);
+        if (Objects.isNull(endDate)) endDate = LocalDate.of(2038, 12, 30);
+        Page<CurrencyTransaction> currencyTransactions = transactionService.getAllFromGivenDates(startDate, endDate, pageNumber);
+        pageDto.setPage(pageNumber);
+        pageDto.setTotalPages(currencyTransactions.getTotalPages());
+        currencyTransactions.getContent().forEach(currencyTransaction -> transactionDtos.add(mapper.toDto(currencyTransaction)));
+        return pageDto;
     }
 }

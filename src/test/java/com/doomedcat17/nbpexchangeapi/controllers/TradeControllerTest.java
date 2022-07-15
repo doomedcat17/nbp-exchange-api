@@ -1,6 +1,7 @@
 package com.doomedcat17.nbpexchangeapi.controllers;
 
-import com.doomedcat17.nbpexchangeapi.data.SellRequestDto;
+import com.doomedcat17.nbpexchangeapi.data.dto.PageDto;
+import com.doomedcat17.nbpexchangeapi.data.dto.SellRequestDto;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,8 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,6 +39,12 @@ class TradeControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    public TradeControllerTest() {
+        this.objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+    }
+
 
     @SneakyThrows
     @Test
@@ -143,23 +149,26 @@ class TradeControllerTest {
     @Test
     void shouldReturnHistoryFromGivenDate() {
         //given
-        LocalDate date = LocalDate.parse("2021-11-29");
+        String textDate = "2021-11-29";
+        LocalDate date = LocalDate.parse(textDate);
 
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/trade/history/{date}", date))
+                .perform(get("/api/trade").param("startDate", textDate)
+                        .param("endDate", textDate))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
         //then
-        List<TransactionDto> transactions = objectMapper
+        PageDto<TransactionDto> transactions = objectMapper
                 .readValue(result.getResponse().getContentAsString(),
-                        new TypeReference<>() {});
+                        new TypeReference<>() {
+                        });
 
-        assertEquals(2, transactions.size());
-        assertTrue(transactions.stream().allMatch(
-                transactionDto -> transactionDto.getDate().isAfter(LocalDateTime.from(date.minusDays(1)))
-                        && transactionDto.getDate().isBefore(LocalDateTime.from(date.plusDays(1)))
-        ));
+        assertEquals(2, transactions.getResults().size());
+        assertTrue(transactions.getResults().stream().allMatch(
+                transactionDto -> transactionDto.getDate().isAfter(date.atTime(LocalTime.MIN))
+                        && transactionDto.getDate().isBefore(date.atTime(LocalTime.MAX)))
+        );
     }
 
     @SneakyThrows
@@ -188,35 +197,6 @@ class TradeControllerTest {
         mockMvc.perform(get("/api/trade/history/{startDate}/{endDate}", startDate, endDate))
                 .andExpect(result1 -> status().isBadRequest());
 
-    }
-
-    @SneakyThrows
-    @Test
-    void shouldReturnHistoryFromGivenDates() {
-        //given
-        LocalDate startDate = LocalDate.parse("2021-11-29");
-
-        LocalDate endDate = LocalDate.parse("2021-12-01");
-        //when
-        MvcResult result = mockMvc
-                .perform(get("/api/trade/history/{startDate}/{endDate}", startDate, endDate))
-                .andExpect(result1 -> status().isOk()).andReturn();
-
-        //then
-        List<TransactionDto> transactions = objectMapper
-                .readValue(result.getResponse().getContentAsString(),
-                        new TypeReference<>() {});
-
-        assertEquals(4, transactions.size());
-        assertTrue(transactions.stream().allMatch(
-                transactionDto -> transactionDto.getDate().isAfter(LocalDateTime.from(startDate)) && transactionDto.getDate().isBefore(LocalDateTime.from(endDate))
-        ));
-    }
-
-
-    public TradeControllerTest() {
-        this.objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
     }
 
 
