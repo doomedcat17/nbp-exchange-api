@@ -1,75 +1,40 @@
 package com.doomedcat17.nbpexchangeapi.repository;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
-import com.doomedcat17.nbpexchangeapi.repository.dao.CurrencyDao;
-import com.doomedcat17.nbpexchangeapi.repository.dao.NbpExchangeRateDao;
-import com.doomedcat17.nbpexchangeapi.services.WorkWeekStartDateProvider;
-import org.springframework.data.domain.PageRequest;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import javax.transaction.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Transactional
-public class NbpExchangeRateRepository {
+public interface NbpExchangeRateRepository extends JpaRepository<NbpExchangeRate, Long> {
 
-    private final NbpExchangeRateDao nbpExchangeRateDAO;
+    @Query("SELECT rates FROM NbpExchangeRate rates WHERE rates.currency.code = :code AND rates.effectiveDate= :effectiveDate")
+    Optional<NbpExchangeRate> getByCurrencyCodeAndEffectiveDate(@Param("code") String code, @Param("effectiveDate") LocalDate effectiveDate);
 
-    private final WorkWeekStartDateProvider workWeekStartDateProvider;
 
-    private final CurrencyDao currencyDAO;
+    @Query("SELECT COUNT(rates) FROM NbpExchangeRate rates WHERE rates.currency.code = :code AND rates.effectiveDate= :effectiveDate")
+    long countAllByCurrencyCodeAndEffectiveDate(@Param("code") String currencyCode, @Param("effectiveDate") LocalDate effectiveDate);
 
-    public synchronized void add(NbpExchangeRate nbpExchangeRate) {
-        Optional<NbpExchangeRate> prestentExchangeRate =
-                getByCurrencyCodeAndEffectiveDate(
-                        nbpExchangeRate.getCurrency().getCode(),
-                        nbpExchangeRate.getEffectiveDate());
-        if (prestentExchangeRate.isEmpty()) {
-            Optional<Currency> currency = currencyDAO.findById(nbpExchangeRate.getCurrency().getCode());
-            currency.ifPresent(nbpExchangeRate::setCurrency);
-            nbpExchangeRateDAO.save(nbpExchangeRate);
-        }
-    }
+    long countAllByEffectiveDate(LocalDate effectiveDate);
 
-    public List<NbpExchangeRate> getAllByCurrencyCode(String currencyCode) {
-        return nbpExchangeRateDAO.getAllByCurrencyCode(currencyCode);
-    }
+    List<NbpExchangeRate> getAllByEffectiveDate(LocalDate date);
 
-    public void removeAllOlderThanWeek() {
-        nbpExchangeRateDAO.deleteAllByEffectiveDateBefore(workWeekStartDateProvider.get(LocalDate.now()));
-    }
+    @Query("SELECT rates FROM NbpExchangeRate rates WHERE rates.currency.code = :code ORDER BY rates.effectiveDate DESC")
+    List<NbpExchangeRate> getMostRecentByCode(@Param("code") String code, Pageable pageable);
 
-    public long getSize() {
-        return nbpExchangeRateDAO.count();
-    }
+    @Query("SELECT rates FROM NbpExchangeRate rates WHERE rates.currency.code = :code ORDER BY rates.effectiveDate DESC")
+    List<NbpExchangeRate> getAllByCurrencyCode(@Param("code") String code);
 
-    public List<NbpExchangeRate> getMostRecent() {
-        return nbpExchangeRateDAO.getRecent();
-    }
+    @Query("SELECT rates FROM NbpExchangeRate rates WHERE rates.effectiveDate = " +
+            "(SELECT MAX(rates2.effectiveDate) FROM NbpExchangeRate rates2 WHERE rates.currency.code = rates2.currency.code)")
+    List<NbpExchangeRate> getRecent();
 
-    public Optional<NbpExchangeRate> getByCurrencyCodeAndEffectiveDate(String currencyCode, LocalDate effectiveDate) {
-        NbpExchangeRate foundNbpExchangeRate = nbpExchangeRateDAO
-                .getByCurrencyCodeAndEffectiveDate(currencyCode, effectiveDate);
-        if (foundNbpExchangeRate == null) return Optional.empty();
-        return Optional.of(foundNbpExchangeRate);
-    }
+    void deleteAllByEffectiveDateBefore(LocalDate date);
 
-    public List<NbpExchangeRate> getAllByEffectiveDate(LocalDate effectiveDate) {
-        return nbpExchangeRateDAO.getAllByEffectiveDate(effectiveDate);
-    }
-
-    public Optional<NbpExchangeRate> getMostRecentByCurrencyCode(String currencyCode) {
-        List<NbpExchangeRate> foundExchangeRates = nbpExchangeRateDAO.getMostRecentByCode(currencyCode, PageRequest.of(0, 1));
-        if (!foundExchangeRates.isEmpty()) return Optional.of(foundExchangeRates.get(0));
-        else return Optional.empty();
-    }
-
-    public NbpExchangeRateRepository(NbpExchangeRateDao nbpExchangeRateDAO, WorkWeekStartDateProvider workWeekStartDateProvider, CurrencyDao currencyDAO) {
-        this.nbpExchangeRateDAO = nbpExchangeRateDAO;
-        this.workWeekStartDateProvider = workWeekStartDateProvider;
-        this.currencyDAO = currencyDAO;
-    }
 }

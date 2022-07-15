@@ -1,11 +1,8 @@
 package com.doomedcat17.nbpexchangeapi.controllers;
 
-import com.doomedcat17.nbpexchangeapi.data.CurrencyTransaction;
-import com.doomedcat17.nbpexchangeapi.data.SellRequestDto;
-import com.doomedcat17.nbpexchangeapi.data.dto.ExchangeRateDTO;
-import com.doomedcat17.nbpexchangeapi.data.dto.RateDTO;
+import com.doomedcat17.nbpexchangeapi.data.dto.PageDto;
+import com.doomedcat17.nbpexchangeapi.data.dto.SellRequestDto;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
-import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -21,13 +18,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,6 +39,12 @@ class TradeControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    public TradeControllerTest() {
+        this.objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+    }
+
 
     @SneakyThrows
     @Test
@@ -148,32 +149,26 @@ class TradeControllerTest {
     @Test
     void shouldReturnHistoryFromGivenDate() {
         //given
-        LocalDate date = LocalDate.parse("2021-11-29");
+        String textDate = "2021-11-29";
+        LocalDate date = LocalDate.parse(textDate);
 
-        Date dayStart = java.sql.Date.from(date.atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-
-        Date dayEnd = java.sql.Date.from(date.atStartOfDay()
-                .plusHours(23)
-                .plusMinutes(59)
-                .plusSeconds(59)
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
         //when
         MvcResult result = mockMvc
-                .perform(get("/api/trade/history/{date}", date))
+                .perform(get("/api/trade").param("startDate", textDate)
+                        .param("endDate", textDate))
                 .andExpect(result1 -> status().isOk()).andReturn();
 
         //then
-        List<TransactionDto> transactions = objectMapper
+        PageDto<TransactionDto> transactions = objectMapper
                 .readValue(result.getResponse().getContentAsString(),
-                        new TypeReference<>() {});
+                        new TypeReference<>() {
+                        });
 
-        assertEquals(2, transactions.size());
-        assertTrue(transactions.stream().allMatch(
-                transactionDto -> transactionDto.getDate().after(dayStart) && transactionDto.getDate().before(dayEnd)
-        ));
+        assertEquals(2, transactions.getResults().size());
+        assertTrue(transactions.getResults().stream().allMatch(
+                transactionDto -> transactionDto.getDate().isAfter(date.atTime(LocalTime.MIN))
+                        && transactionDto.getDate().isBefore(date.atTime(LocalTime.MAX)))
+        );
     }
 
     @SneakyThrows
@@ -202,46 +197,6 @@ class TradeControllerTest {
         mockMvc.perform(get("/api/trade/history/{startDate}/{endDate}", startDate, endDate))
                 .andExpect(result1 -> status().isBadRequest());
 
-    }
-
-    @SneakyThrows
-    @Test
-    void shouldReturnHistoryFromGivenDates() {
-        //given
-        LocalDate startDate = LocalDate.parse("2021-11-29");
-
-        LocalDate endDate = LocalDate.parse("2021-12-01");
-
-        Date start = java.sql.Date.from(startDate.atStartOfDay()
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-
-        Date end = java.sql.Date.from(endDate.atStartOfDay()
-                .plusHours(23)
-                .plusMinutes(59)
-                .plusSeconds(59)
-                .atZone(ZoneId.systemDefault())
-                .toInstant());
-        //when
-        MvcResult result = mockMvc
-                .perform(get("/api/trade/history/{startDate}/{endDate}", startDate, endDate))
-                .andExpect(result1 -> status().isOk()).andReturn();
-
-        //then
-        List<TransactionDto> transactions = objectMapper
-                .readValue(result.getResponse().getContentAsString(),
-                        new TypeReference<>() {});
-
-        assertEquals(4, transactions.size());
-        assertTrue(transactions.stream().allMatch(
-                transactionDto -> transactionDto.getDate().after(start) && transactionDto.getDate().before(end)
-        ));
-    }
-
-
-    public TradeControllerTest() {
-        this.objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
     }
 
 

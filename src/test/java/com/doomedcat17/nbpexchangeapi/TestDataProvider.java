@@ -1,7 +1,7 @@
 package com.doomedcat17.nbpexchangeapi;
 
-import com.doomedcat17.nbpexchangeapi.data.Currency;
-import com.doomedcat17.nbpexchangeapi.data.NbpExchangeRate;
+import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
+import com.doomedcat17.nbpexchangeapi.data.domain.NbpExchangeRate;
 
 import java.io.File;
 import java.io.FileNotFoundException;
