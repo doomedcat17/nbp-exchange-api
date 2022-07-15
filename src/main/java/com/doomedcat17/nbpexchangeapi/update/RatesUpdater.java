@@ -24,8 +24,8 @@ public class RatesUpdater {
 
     private final StartWorkDateProvider startWorkDateProvider;
 
-    @Value("${doomedcat17.nbp-exchange-api.updater.sleep-time-ms-on-failure:900000}")
-    private long updaterSleepTimeMsOnUpdateFailure;
+    @Value("${doomedcat17.nbp-exchange-api.updater.sleep-time-on-failure:900}")
+    private long updaterSleepTimeOnUpdateFailure;
 
     @Value("${doomedcat17.nbp-exchange-api.rates-ttl-in-workdays:0}")
     private int ratesTTLInWorkdays;
@@ -43,7 +43,7 @@ public class RatesUpdater {
             try {
                 log.error("Update failed. Api returned empty collection");
                 log.info("Sleeping...");
-                Thread.sleep(updaterSleepTimeMsOnUpdateFailure);
+                Thread.sleep(updaterSleepTimeOnUpdateFailure*1000);
                 update(isFirstUpdate);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

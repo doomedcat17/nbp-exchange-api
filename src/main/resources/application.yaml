@@ -15,7 +15,6 @@ spring:
       ddl-auto: none
     open-in-view: false
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
