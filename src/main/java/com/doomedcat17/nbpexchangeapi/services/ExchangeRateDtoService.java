@@ -5,10 +5,11 @@ import com.doomedcat17.nbpexchangeapi.data.dto.PageDto;
 import com.doomedcat17.nbpexchangeapi.data.dto.RateDto;
 import com.doomedcat17.nbpexchangeapi.mapper.NbpExchangeRateMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +17,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ExchangeRateDtoService {
 
     private final ExchangeRateService exchangeRateService;
     private final NbpExchangeRateMapper mapper = NbpExchangeRateMapper.INSTANCE;
+
+    @Value("${doomedcat17.nbp-exchange-api.page-size:50}")
+    private int pageSize;
 
     @Cacheable(cacheNames = "rateDtos", key = "#code")
     public PageDto<RateDto> getRecentExchangeRatesForCode(String code) {
@@ -37,10 +42,8 @@ public class ExchangeRateDtoService {
         PageDto<RateDto> pageDto = new PageDto();
         List<NbpExchangeRate> exchangeRates;
         if (Objects.isNull(effectiveDate)) {
-            Page<NbpExchangeRate> nbpExchangeRatePage = exchangeRateService.getAllByCurrencyCode(currencyCode, pageNum);
+            exchangeRates = exchangeRateService.getAllByCurrencyCode(currencyCode);
             pageDto.setPage(pageNum);
-            pageDto.setTotalPages(nbpExchangeRatePage.getTotalPages());
-            exchangeRates = nbpExchangeRatePage.getContent();
         } else {
             pageDto.setPage(1);
             pageDto.setTotalPages(1);
@@ -50,17 +53,14 @@ public class ExchangeRateDtoService {
         }
 
 
-        if (exchangeRates.isEmpty()) return pageDto;
-        List<RateDto> rates = new ArrayList<>();
-        for (NbpExchangeRate baseExchangeRate : exchangeRates) {
-            List<NbpExchangeRate> exchangeRatesToMap =
-                    exchangeRateService.getAllByEffectiveDate(baseExchangeRate.getEffectiveDate());
-            exchangeRatesToMap.stream().filter(nbpExchangeRate -> !nbpExchangeRate.getCurrency().getCode().equals(currencyCode))
-                    .forEach(nbpExchangeRate -> rates.add(mapper.toRateDto(nbpExchangeRate, baseExchangeRate)));
+        if (exchangeRates.isEmpty()) {
+            pageDto.setResults(List.of());
+            return pageDto;
         }
-        pageDto.setResults(rates);
+        mapRates(pageDto, exchangeRates, currencyCode, Optional.empty());
         return pageDto;
     }
+
 
     @Cacheable(cacheNames = "rateExchangeDto", key = "#sourceCurrencyCode.concat(#targetCurrencyCode)")
     public PageDto<RateDto> getRecentExchangeRate(String sourceCurrencyCode, String targetCurrencyCode) {
@@ -90,19 +90,16 @@ public class ExchangeRateDtoService {
             NbpExchangeRate sourceExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(sourceCurrencyCode, effectiveDate).get();
             NbpExchangeRate targetExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(targetCurrencyCode, effectiveDate).get();
             targetRates.add(mapper.toRateDto(targetExchangeRate, sourceExchangeRate));
+            pageDto.setResults(targetRates);
+            pageDto.setTotalPages(1);
         } else {
-            Page<NbpExchangeRate> sourceExchangeRates = exchangeRateService.getAllByCurrencyCode(sourceCurrencyCode, pageNum);
-            pageDto.setTotalPages(sourceExchangeRates.getTotalPages());
-            if (sourceExchangeRates.isEmpty()) return pageDto;
-            for (NbpExchangeRate sourceExchangeRate : sourceExchangeRates) {
-                Optional<NbpExchangeRate> targetExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(
-                        targetCurrencyCode, sourceExchangeRate.getEffectiveDate()
-                );
-                if (targetExchangeRate.isEmpty()) continue;
-                targetRates.add(mapper.toRateDto(targetExchangeRate.get(), sourceExchangeRate));
+            List<NbpExchangeRate> sourceExchangeRates = exchangeRateService.getAllByCurrencyCode(sourceCurrencyCode);
+            if (sourceExchangeRates.isEmpty()) {
+                pageDto.setResults(List.of());
+                return pageDto;
             }
+            mapRates(pageDto, sourceExchangeRates, sourceCurrencyCode, Optional.of(targetCurrencyCode));
         }
-        pageDto.setResults(targetRates);
         return pageDto;
     }
 
@@ -124,6 +121,8 @@ public class ExchangeRateDtoService {
     }
 
 
+
+
     protected Optional<RateDto> getRecentRate(NbpExchangeRate baseExchangeRate, NbpExchangeRate targetExchangeRate) {
         if (!baseExchangeRate.getEffectiveDate().equals(targetExchangeRate.getEffectiveDate())) {
             Optional<NbpExchangeRate> foundSourceExchangeRate = exchangeRateService.getByCurrencyCodeAndEffectiveDate(
@@ -141,6 +140,44 @@ public class ExchangeRateDtoService {
         }
         return Optional.of(mapper.toRateDto(targetExchangeRate, baseExchangeRate));
 
+    }
+
+    private void mapRates(PageDto<RateDto> pageDto, List<NbpExchangeRate> baseNbpRates, String baseCode, Optional<String> targetCurrencyCode) {
+        List<RateDto> rates = new ArrayList<>();
+        long totalCounter = 0;
+        int counter = 0;
+        long skipNum = (pageDto.getPage()-1)*pageSize;
+        for (NbpExchangeRate baseExchangeRate : baseNbpRates) {
+            List<NbpExchangeRate> exchangeRatesToMap;
+            exchangeRatesToMap = targetCurrencyCode.map(s -> List.of(exchangeRateService
+                            .getByCurrencyCodeAndEffectiveDate(
+                                    s, baseExchangeRate.getEffectiveDate()).get()))
+                    .orElseGet(() -> exchangeRateService.getAllByEffectiveDate(baseExchangeRate.getEffectiveDate()));
+            if (targetCurrencyCode.isPresent())
+                totalCounter += exchangeRateService.getSizeByCodeAndEffectiveDate(targetCurrencyCode.get(), baseExchangeRate.getEffectiveDate());
+            else totalCounter += exchangeRateService.getSizeByEffectiveDate(baseExchangeRate.getEffectiveDate());
+            List<RateDto> currentRates = exchangeRatesToMap.stream().filter(nbpExchangeRate -> !nbpExchangeRate.getCurrency().getCode().equals(baseCode))
+                    .map(nbpExchangeRate -> mapper.toRateDto(nbpExchangeRate, baseExchangeRate)).toList();
+
+
+            if (currentRates.size() <= skipNum) {
+                skipNum -= exchangeRatesToMap.size();
+            } else {
+                for (RateDto rate : currentRates) {
+                    if (skipNum != 0) {
+                        skipNum--;
+                    } else if (counter < pageSize) {
+                        rates.add(rate);
+                        counter++;
+                    }
+                }
+
+            }
+        }
+        long totalPages = totalCounter/pageSize;
+        if (totalCounter%pageSize != 0) totalPages++;
+        pageDto.setTotalPages(totalPages);
+        pageDto.setResults(rates);
     }
 
 }

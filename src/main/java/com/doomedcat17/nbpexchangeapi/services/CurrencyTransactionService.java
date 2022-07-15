@@ -4,7 +4,8 @@ import com.doomedcat17.nbpexchangeapi.data.domain.Currency;
 import com.doomedcat17.nbpexchangeapi.data.domain.CurrencyTransaction;
 import com.doomedcat17.nbpexchangeapi.data.dto.TransactionDto;
 import com.doomedcat17.nbpexchangeapi.repository.CurrencyTransactionRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,13 @@ import java.time.LocalTime;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CurrencyTransactionService {
 
     private final CurrencyTransactionRepository currencyTransactionRepository;
     private final CurrencyService currencyService;
+    @Value("${doomedcat17.nbp-exchange-api.page-size:50}")
+    private int pageSize;
 
     public void addTransaction(TransactionDto transactionDto) {
         CurrencyTransaction currencyTransaction = new CurrencyTransaction();
@@ -36,7 +39,7 @@ public class CurrencyTransactionService {
 
     public Page<CurrencyTransaction> getAllFromGivenDates(LocalDate startDate, LocalDate endDate, int pageNum) {
         return currencyTransactionRepository
-                .getAllBetweenDates(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX), PageRequest.of(pageNum - 1, 50));
+                .getAllBetweenDates(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX), PageRequest.of(pageNum - 1, pageSize));
     }
 
     public void removeAllOlderThanGivenDate(LocalDate date) {

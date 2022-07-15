@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,6 @@ public class ExchangeRateService {
     private final NbpExchangeRateRepository nbpExchangeRateRepository;
 
     private final CurrencyService currencyService;
-    private int pageSize = 50;
 
     @Caching(evict = {
             @CacheEvict(cacheNames = {"allRecentRates", "ratesSize", "rateExchangeDto"}, allEntries = true),
@@ -43,8 +41,8 @@ public class ExchangeRateService {
         }
     }
 
-    public Page<NbpExchangeRate> getAllByCurrencyCode(String currencyCode, int pageNum) {
-        return nbpExchangeRateRepository.getAllByCurrencyCode(currencyCode, PageRequest.of(pageNum - 1, pageSize));
+    public List<NbpExchangeRate> getAllByCurrencyCode(String currencyCode) {
+        return nbpExchangeRateRepository.getAllByCurrencyCode(currencyCode);
     }
 
     public void removeAllOlderThanGivenDate(LocalDate date) {
@@ -54,6 +52,14 @@ public class ExchangeRateService {
     @Cacheable(cacheNames = "ratesSize")
     public long getSize() {
         return nbpExchangeRateRepository.count();
+    }
+
+    public long getSizeByCodeAndEffectiveDate(String currencyCode, LocalDate effectiveDate) {
+        return nbpExchangeRateRepository.countAllByCurrencyCodeAndEffectiveDate(currencyCode, effectiveDate);
+    }
+
+    public long getSizeByEffectiveDate(LocalDate effectiveDate) {
+        return nbpExchangeRateRepository.countAllByEffectiveDate(effectiveDate);
     }
 
     @Cacheable(cacheNames = "allRecentRates")
