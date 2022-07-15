@@ -1,10 +1,8 @@
 package com.doomedcat17.nbpexchangeapi.init;
 
 import com.doomedcat17.nbpexchangeapi.update.RatesUpdater;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,7 @@ public class AppInitializer implements CommandLineRunner {
     private volatile boolean isInitialized = false;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         synchronized (this) {
             if (!isInitialized) {
                 init();
@@ -30,7 +28,7 @@ public class AppInitializer implements CommandLineRunner {
 
     private void init() {
         log.info("Initializing...");
-        ratesUpdater.update();
+        ratesUpdater.update(true);
         log.info("Initialization complete!");
     }
 

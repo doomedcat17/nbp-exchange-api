@@ -34,16 +34,17 @@ public class RatesUpdater {
     private int transactionsTTLInWorkdays;
 
 
-    public void update() {
+    public void update(boolean isFirstUpdate) {
         log.info("Updating...");
-        Set<NbpExchangeRate> nbpExchangeRates =
-                nbpRatesProvider.getRecent();
+        Set<NbpExchangeRate> nbpExchangeRates;
+        if (isFirstUpdate) nbpExchangeRates = nbpRatesProvider.getNbpExchangeRatesFromLastWeek(LocalDate.now());
+        else nbpExchangeRates = nbpRatesProvider.getRecent();
         if (nbpExchangeRates.isEmpty()) {
             try {
                 log.error("Update failed. Api returned empty collection");
                 log.info("Sleeping...");
                 Thread.sleep(updaterSleepTimeMsOnUpdateFailure);
-                update();
+                update(isFirstUpdate);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.error("Update process interrupted");
