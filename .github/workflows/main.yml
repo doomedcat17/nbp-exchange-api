@@ -21,3 +21,4 @@ jobs:
           HD_DB_PORT: ${{secrets.DB_PORT}}
           HD_DB_NAME: ${{secrets.DB_NAME}}
           HD_SPRING_PROFILES_ACTIVE: prod
+
