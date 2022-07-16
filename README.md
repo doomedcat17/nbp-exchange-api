@@ -4,17 +4,15 @@ A simple REST application to retrieve exchange rate data directly from the [NBP]
 
 - [Description](#description)
 - [Setup](#setup)
-- [Dokumentacja](#dokumentacja)
-  - [Initialization](#inicjalizacja)
-  - [Endpoints](#endpointy)
-    - [Getting rates](#pobieranie-kursów)
-    - [Rate exchange](#wymiana-walut)
-    - [Transaction Histort](#historia-wymiany-walut)
-    - [Komunikaty błędów](#komunikaty-błędów)
-- [Stack](#stack)
+- [Docs](#docs)
+  - [Initialization](#initialization)
+  - [Endpoints](#endpoints)
+    - [Getting rates](#getting-all-rates)
+    - [Making trade](#making-trade)
+    - [Trade history](#trade-history)
+    - [Error responses](#error-responses)
 
-**Aplikacja jest dostępna na [Heroku](https://nbp-exchange-api.herokuapp.com/api/rates/pln/recent)! (działa na darmowym hostingu MySQL, więc prędkość nie powala :P)**
-
+**The app is available on [Heroku](https://nbp-exchange-api.herokuapp.com/api/rates/recent?currency=PLN)! (free tier, so it may not be available a few hours a day)**
 # Description
 The app is based on the NBP API, specifically Tables A and B, so *de facto* uses averaged rates.
 It allows conversion of currency conversions and the addition and review of transactions.
@@ -24,7 +22,7 @@ The updates occur Monday to Friday at 12:31 p.m. This is because the NBP updates
 Make sure you have [git](https://git-scm.com/) installed.
 The application uses Postgres as the database by default.
 It is required to provide database connection URL and database user conditionals for an application to run.  
-**If you do not want to play around with the database configuration you can use the 'H2' profile. Explained below**
+**If you do not want to play around with the database configuration you can use the 'H2' profile. Explained below**.
 
 ### Maven
 
@@ -107,7 +105,7 @@ Property                                            | Default value | Descriptio
 
 #### Getting all rates
 
-Return rates based on parameters
+Return rates based on parameters.
 
 ```
 /api/rates
@@ -194,7 +192,7 @@ Return rates based on parameters
 
 #### Getting most recent rates
 
-Return rates based on parameters
+Return most recent rates based on parameters.
 
 ```
 /api/rates/recent
@@ -279,7 +277,7 @@ Return rates based on parameters
 
 #### Making trade
 
-Performs a transaction and returns the result
+Performs a transaction and returns the result.
 
 ##### GET method
 ```
@@ -340,20 +338,20 @@ Request body:
 </p>
 </details>
 
-#### Getting trade history
+#### Trade history
 
-Return history of transactions based on parameters
+Return history of transactions based on parameters.
 
 ```
 /api/trade
 ```
 
 
-| Paramater | Default value | Details                                               |
-|-----------|---------------|-------------------------------------------------------|
-| startDate | None          | Returns all transaction since this date               |
-| endDate   | None          | Returns all transaction since to this date            |
-| page      | *1*           | Pagination parameter. Max 50 results per page.      |
+| Paramater | Default value | Details                                        |
+|-----------|---------------|------------------------------------------------|
+| startDate | None          | Returns all transaction since this date.       |
+| endDate   | None          | Returns all transaction since to this date.    |
+| page      | *1*           | Pagination parameter. Max 50 results per page. |
 
 
 <details><summary><b>Sample Response</b></summary>
@@ -371,6 +369,17 @@ Return history of transactions based on parameters
 
 </p>
 </details>
+
+#### Error responses
+
+Table of possible error responses:
+
+| Cause                     | Code | Response body |
+|---------------------------| ------------- | ------------- |
+| Invalid resource path     | 404  | `{"title": "Not Found", "status": 404,"detail": "No handler found for GET /"}` |
+| Missing currecy parameter | 400  | `{"title": "Bad Request", "status": 400,"detail": "Required request parameter 'currency' for method parameter type String is not present"}`|
+
+
 
 
 
